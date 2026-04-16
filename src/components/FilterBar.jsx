@@ -17,12 +17,12 @@ export default function FilterBar({ category, onCategory }) {
           onClick={() => onCategory(cat.id)}
           className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
             category === cat.id
-              ? 'bg-blue-700 text-white'
+              ? 'bg-teal-700 text-white'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
           {cat.en}
-          <span className={`ml-1 ${category === cat.id ? 'text-blue-200' : 'text-gray-400'}`}>
+          <span className={`ml-1 ${category === cat.id ? 'text-teal-200' : 'text-gray-400'}`}>
             {cat.ja}
           </span>
         </button>

@@ -64,7 +64,7 @@ export default function Sidebar({
                 onClick={() => onTab(t.id)}
                 className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${
                   tab === t.id
-                    ? 'border-b-2 border-blue-700 text-blue-700'
+                    ? 'border-b-2 border-teal-700 text-teal-700'
                     : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
