@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const CATEGORIES = ['Nature', 'Workshop', 'Culture', 'Sports', 'Library', 'Other']
 const CATEGORY_JA = { Nature: '自然', Workshop: 'ワーク', Culture: '文化', Sports: '運動', Library: '図書', Other: 'その他' }
@@ -26,6 +26,12 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState(null)
   const [done,       setDone]       = useState(false)
+
+  // Lock body scroll while modal is open (prevents iOS background scroll bleed)
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
 
@@ -85,7 +91,7 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-5" style={{ WebkitOverflowScrolling: 'touch' }}>
 
           {/* Location */}
           <div>
