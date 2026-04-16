@@ -124,6 +124,7 @@ export async function createCmsItem(type, data) {
   const fields = buildFields(type, enrichedData)
     .filter(Boolean)
     .filter((f) => f.value !== '' && f.value !== undefined && f.value !== null)
+    .filter((f) => !(Array.isArray(f.value) && f.value.length === 0))
 
   const res = await fetch(
     `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items`,
