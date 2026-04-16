@@ -408,7 +408,7 @@ export default function App() {
         <AdminPage onClose={() => setAdminOpen(false)} />
       )}
 
-      <WelcomeOverlay onDismiss={() => setWelcomed(true)} />
+      <WelcomeOverlay onDismiss={() => setWelcomed(true)} key="welcome" />
     </div>
     </div>
   )
