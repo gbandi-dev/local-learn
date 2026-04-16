@@ -165,7 +165,7 @@ export default function App() {
           </div>
           <p className="text-teal-400 text-xs mt-1">北広島町 · Kitahiroshimacho</p>
           {usingDemo && (
-            <span className="mt-2 inline-block text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-bold">デモ / Demo</span>
+            <span className="mt-2 inline-block text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-bold">ベータ / Beta</span>
           )}
         </div>
 
@@ -229,7 +229,7 @@ export default function App() {
               <p className="text-teal-200 text-xs">北広島町</p>
             </div>
           </div>
-          {usingDemo && <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-bold">デモ</span>}
+          {usingDemo && <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-bold">ベータ</span>}
         </header>
 
         {/* Mobile top nav tabs */}

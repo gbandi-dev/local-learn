@@ -98,7 +98,8 @@ export default function DetailPanel({ item, onBack }) {
           {/* Demo notice */}
           {item._demo && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-              デモデータです。CMSにデータが登録されると自動的に置き換わります。
+              ベータデータです。CMSにデータが登録されると自動的に置き換わります。
+              <span className="block opacity-60 mt-0.5">Beta data — replaced once CMS is populated.</span>
             </div>
           )}
         </div>

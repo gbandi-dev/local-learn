@@ -1,5 +1,4 @@
-// Demo data used as fallback while the Re:Earth CMS endpoints are empty.
-// Remove or replace once live data is published.
+// Beta data — shown while CMS is being populated. Replace with real entries.
 
 export const SAMPLE_SPOTS = [
   {
@@ -9,11 +8,10 @@ export const SAMPLE_SPOTS = [
     _type: 'spot',
     geometry: { type: 'Point', coordinates: [132.334, 34.674] },
     properties: {
-      name: 'Kitahiroshima Town Library',
-      name_ja: '北広島町立図書館',
-      description: 'Public library with local history, agriculture, and traditional craft collections. Open to all ages.',
+      name: '北広島町立図書館（Kitahiroshima Town Library）',
+      description: '地元の歴史・農業・伝統工芸の資料が充実した公立図書館。全年齢対応。',
       category: 'Library',
-      languages: ['Japanese'],
+      'recommended-for': ['Children', 'Students', 'Adults'],
     },
   },
   {
@@ -23,11 +21,10 @@ export const SAMPLE_SPOTS = [
     _type: 'spot',
     geometry: { type: 'Point', coordinates: [132.320, 34.700] },
     properties: {
-      name: 'Sandankyo Nature Trail',
-      name_ja: '三段峡 自然トレイル',
-      description: 'Scenic gorge trail with guided nature walks through old-growth forest and crystal-clear streams.',
+      name: '三段峡 自然トレイル（Sandankyo Gorge Trail）',
+      description: '原生林と清流が続く渓谷。季節ごとのガイドウォークも開催中。',
       category: 'Nature',
-      languages: ['Japanese', 'English'],
+      'recommended-for': ['Families', 'Adults'],
     },
   },
   {
@@ -37,11 +34,10 @@ export const SAMPLE_SPOTS = [
     _type: 'spot',
     geometry: { type: 'Point', coordinates: [132.350, 34.665] },
     properties: {
-      name: 'Community Workshop Hall',
-      name_ja: 'コミュニティ工房',
-      description: 'Hands-on workshops in woodworking, natural dyeing, and traditional craft making.',
+      name: 'コミュニティ工房（Community Workshop Hall）',
+      description: '木工・草木染め・伝統工芸の体験ができる町の工房。',
       category: 'Workshop',
-      languages: ['Japanese'],
+      'recommended-for': ['Everyone'],
     },
   },
   {
@@ -51,11 +47,10 @@ export const SAMPLE_SPOTS = [
     _type: 'spot',
     geometry: { type: 'Point', coordinates: [132.328, 34.660] },
     properties: {
-      name: 'Kagura Cultural Center',
-      name_ja: '神楽文化センター',
-      description: 'Experience Hiroshima kagura (sacred dance) and local performing arts. Regular performances on weekends.',
+      name: '神楽文化センター（Kagura Cultural Center）',
+      description: '広島神楽の上演と伝統芸能を体験できる施設。週末に定期公演あり。',
       category: 'Culture',
-      languages: ['Japanese'],
+      'recommended-for': ['Everyone'],
     },
   },
   {
@@ -65,11 +60,10 @@ export const SAMPLE_SPOTS = [
     _type: 'spot',
     geometry: { type: 'Point', coordinates: [132.342, 34.680] },
     properties: {
-      name: 'Kitahiroshima Sports Park',
-      name_ja: '北広島スポーツ公園',
-      description: 'Multi-use sports facility with fields and courts open to community groups and school teams.',
+      name: '北広島スポーツ公園（Kitahiroshima Sports Park）',
+      description: '地域チームや学校にも開放されている多目的スポーツ施設。',
       category: 'Sports',
-      languages: ['Japanese'],
+      'recommended-for': ['Children', 'Students', 'Adults'],
     },
   },
 ]
@@ -82,11 +76,11 @@ export const SAMPLE_MENTORS = [
     _type: 'mentor',
     geometry: { type: 'Point', coordinates: [132.336, 34.676] },
     properties: {
-      name: 'Tanaka Hiroshi',
-      name_ja: '田中 弘',
-      description: 'Local forest guide and naturalist with 20+ years exploring the Chugoku mountains. Leads seasonal walks for families.',
+      name: '田中ひろし',
+      'what-i-can-teach': '中国山地を20年以上歩いてきた地元の森案内人。家族向けの季節の散策を定期開催。',
       category: 'Nature',
-      languages: ['Japanese'],
+      languages: 'Japanese',
+      'available-when': '週末・午前中',
     },
   },
   {
@@ -96,11 +90,11 @@ export const SAMPLE_MENTORS = [
     _type: 'mentor',
     geometry: { type: 'Point', coordinates: [132.345, 34.671] },
     properties: {
-      name: 'Yamamoto Keiko',
-      name_ja: '山本 恵子',
-      description: 'Traditional indigo dyeing and weaving instructor. Teaches at the community hall on Saturdays.',
+      name: '山本けいこ',
+      'what-i-can-teach': '伝統的な藍染めと機織りの先生。毎週土曜日に町の集会所で教室を開いています。',
       category: 'Workshop',
-      languages: ['Japanese', 'English'],
+      languages: 'Japanese',
+      'available-when': '毎週土曜日',
     },
   },
   {
@@ -110,11 +104,25 @@ export const SAMPLE_MENTORS = [
     _type: 'mentor',
     geometry: { type: 'Point', coordinates: [132.329, 34.678] },
     properties: {
-      name: 'Suzuki Taro',
-      name_ja: '鈴木 太郎',
-      description: 'Kagura performer and cultural heritage ambassador. Available for school visits and community events.',
+      name: '鈴木たろう',
+      'what-i-can-teach': '神楽の舞い手・文化遺産アンバサダー。学校訪問や地域イベントにも対応可能。',
       category: 'Culture',
-      languages: ['Japanese'],
+      languages: 'Japanese',
+      'available-when': '要相談',
+    },
+  },
+  {
+    type: 'Feature',
+    id: 'demo-mentor-4',
+    _demo: true,
+    _type: 'mentor',
+    geometry: { type: 'Point', coordinates: [132.338, 34.669] },
+    properties: {
+      name: '吉田おばあちゃん',
+      'what-i-can-teach': '北広島の餅つき・梅干し・漬物の作り方を教えてくれます。昔ながらの知恵が聞けます。',
+      category: 'Culture',
+      languages: 'Japanese',
+      'available-when': '午後なら大抵いるよ',
     },
   },
 ]
