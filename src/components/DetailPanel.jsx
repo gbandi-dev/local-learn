@@ -5,6 +5,17 @@ const TYPE = {
   mentor: { ja: 'まちの人',   en: 'Person in Town',  bg: 'bg-orange-500', pill: 'bg-orange-100 text-orange-700' },
 }
 
+function extractPhotoUrl(photo) {
+  if (!photo) return null
+  if (typeof photo === 'string') return photo
+  if (Array.isArray(photo)) {
+    const first = photo[0]
+    if (!first) return null
+    return first.url ?? first
+  }
+  return photo.url ?? null
+}
+
 export default function DetailPanel({ item, onBack }) {
   const p    = item.properties ?? {}
   const meta = TYPE[item._type] ?? TYPE.spot
@@ -32,8 +43,8 @@ export default function DetailPanel({ item, onBack }) {
 
       <div className="flex-1 overflow-y-auto">
         {/* Photo */}
-        {p.photo ? (
-          <img src={p.photo} alt={name} className="w-full h-44 object-cover" />
+        {extractPhotoUrl(p.photo) ? (
+          <img src={extractPhotoUrl(p.photo)} alt={name} className="w-full h-44 object-cover" />
         ) : (
           <div className="w-full h-32 bg-gray-200 flex items-center justify-center">
             <span className="text-gray-400 text-xs">写真なし</span>
