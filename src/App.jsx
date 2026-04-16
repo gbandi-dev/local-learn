@@ -1,71 +1,101 @@
-import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-
-// Fix Leaflet's broken default icon paths when bundled with Vite
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-})
-
-const CENTER = [34.674, 132.334]
-const ZOOM = 13
-const SPOTS_URL =
-  'https://api.cms.reearth.io/api/p/prototype-workspaces/local-learn/learning-spots.geojson'
+import { useState } from 'react'
+import MapView from './components/MapView'
+import Sidebar from './components/Sidebar'
+import { useGeoData } from './hooks/useGeoData'
 
 export default function App() {
-  const [spots, setSpots] = useState([])
-  const [status, setStatus] = useState('loading') // 'loading' | 'empty' | 'ok' | 'error'
+  const { spots, mentors, loading, error, usingDemo } = useGeoData()
 
-  useEffect(() => {
-    fetch(SPOTS_URL)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
-      })
-      .then((data) => {
-        const features = data.features ?? []
-        setSpots(features)
-        setStatus(features.length === 0 ? 'empty' : 'ok')
-      })
-      .catch(() => setStatus('error'))
-  }, [])
+  const [selected, setSelected]       = useState(null)
+  const [category, setCategory]       = useState('all')
+  const [tab, setTab]                 = useState('all')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const bannerText = {
-    loading: 'Loading learning spots…',
-    empty: 'No spots in the dataset yet — map is ready',
-    error: 'Could not load spots — check the API endpoint',
-    ok: `${spots.length} learning spot${spots.length !== 1 ? 's' : ''} loaded`,
-  }[status]
+  // Build a unified, filtered item list for the sidebar
+  const allItems = [
+    ...spots.map((f) => ({ ...f, _type: f._type ?? 'spot' })),
+    ...mentors.map((f) => ({ ...f, _type: f._type ?? 'mentor' })),
+  ]
+
+  const filtered = allItems.filter((item) => {
+    if (tab === 'spots'   && item._type !== 'spot')   return false
+    if (tab === 'mentors' && item._type !== 'mentor') return false
+    if (category !== 'all') {
+      const cat = (item.properties?.category ?? '').toLowerCase()
+      if (cat !== category.toLowerCase()) return false
+    }
+    return true
+  })
+
+  function handleSelect(item) {
+    setSelected(item)
+    setSidebarOpen(false) // close mobile overlay after selecting from map
+  }
+
+  function handleSidebarSelect(item) {
+    setSelected(item)
+    // Keep sidebar open on mobile so the detail panel is visible
+  }
 
   return (
-    <div style={{ position: 'relative' }}>
-      <div className={`status-banner ${status === 'error' ? 'error' : status === 'empty' ? 'empty' : ''}`}>
-        {bannerText}
-      </div>
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Header */}
+      <header className="bg-emerald-700 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-md z-10">
+        <div>
+          <h1 className="font-bold text-base leading-tight tracking-tight">
+            Local Learn
+          </h1>
+          <p className="text-emerald-200 text-xs">ローカルラーン · 北広島町</p>
+        </div>
 
-      <MapContainer center={CENTER} zoom={ZOOM} className="map-container">
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        <div className="flex items-center gap-2">
+          {usingDemo && (
+            <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-semibold">
+              Demo
+            </span>
+          )}
+          {/* Mobile toggle — hidden on md+ */}
+          <button
+            className="md:hidden text-white text-sm font-medium border border-white/40 px-3 py-1 rounded-full"
+            onClick={() => setSidebarOpen((v) => !v)}
+          >
+            {sidebarOpen ? 'Map' : 'List'}
+          </button>
+        </div>
+      </header>
+
+      {/* Body */}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Backdrop for mobile sidebar */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden fixed inset-0 bg-black/30 z-10"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        <Sidebar
+          items={filtered}
+          loading={loading}
+          error={error}
+          selected={selected}
+          onSelect={handleSidebarSelect}
+          category={category}
+          onCategory={setCategory}
+          tab={tab}
+          onTab={setTab}
+          isOpen={sidebarOpen}
+          onBack={() => setSelected(null)}
         />
 
-        {spots.map((feature, i) => {
-          const [lng, lat] = feature.geometry.coordinates
-          const p = feature.properties ?? {}
-          return (
-            <Marker key={feature.id ?? i} position={[lat, lng]}>
-              <Popup>
-                <strong>{p.name ?? p.Name ?? 'Learning Spot'}</strong>
-                {p.description && <p style={{ margin: '4px 0 0' }}>{p.description}</p>}
-              </Popup>
-            </Marker>
-          )
-        })}
-      </MapContainer>
+        <MapView
+          spots={spots}
+          mentors={mentors}
+          selected={selected}
+          onSelect={handleSelect}
+          category={category}
+        />
+      </div>
     </div>
   )
 }
