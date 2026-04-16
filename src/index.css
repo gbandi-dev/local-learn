@@ -7,6 +7,11 @@ html, body, #root {
   width: 100%;
 }
 
+/* Prevent iOS Safari from zooming in on input focus (requires font-size >= 16px) */
+input, textarea, select {
+  font-size: max(16px, 1em);
+}
+
 .leaflet-container,
 .maplibregl-map {
   height: 100%;
