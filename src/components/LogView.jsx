@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
 const ROLES = [
   { id: 'Student',   ja: '学生・生徒',   en: 'Student'   },
@@ -78,7 +78,6 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
   const [submitting, setSubmitting] = useState(false)
   const [done,       setDone]       = useState(false)
   const [formError,  setFormError]  = useState(null)
-  const cameraRef = useRef()
 
   function handleGeolocate() {
     if (!navigator.geolocation) return
@@ -228,7 +227,7 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
 
         {/* 6. 写真 */}
         <Section num="6" ja="写真" en="Photo">
-          <input ref={cameraRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+          <input id="log-photo" type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
           {photoPreview ? (
             <div className="relative rounded-xl overflow-hidden">
               <img src={photoPreview} alt="preview" className="w-full h-48 object-cover" />
@@ -236,12 +235,12 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
                 className="absolute top-2 right-2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">×</button>
             </div>
           ) : (
-            <button onClick={() => cameraRef.current?.click()}
-              className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-7 active:scale-95 transition-all">
+            <label htmlFor="log-photo"
+              className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-7 cursor-pointer active:scale-95 transition-all">
               <CameraIcon className="w-8 h-8 text-teal-500" />
               <span className="text-sm font-bold text-teal-700">写真を追加</span>
               <span className="text-xs text-teal-500">Add a Photo (optional)</span>
-            </button>
+            </label>
           )}
         </Section>
 

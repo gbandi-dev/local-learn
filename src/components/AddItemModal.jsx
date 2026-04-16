@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 const CATEGORIES = ['Nature', 'Workshop', 'Culture', 'Sports', 'Library', 'Other']
 const CATEGORY_JA = { Nature: '自然', Workshop: 'ワーク', Culture: '文化', Sports: '運動', Library: '図書', Other: 'その他' }
@@ -37,7 +37,6 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
   const [done,         setDone]         = useState(false)
   const [photoFile,    setPhotoFile]    = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
-  const cameraRef = useRef()
 
   // Lock body scroll while modal is open (prevents iOS background scroll bleed)
   useEffect(() => {
@@ -222,7 +221,7 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
           {/* Photo */}
           <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">写真 / Photo <span className="text-gray-400 normal-case font-normal">(任意 / optional)</span></p>
-            <input ref={cameraRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+            <input id="add-item-photo" type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
             {photoPreview ? (
               <div className="relative rounded-xl overflow-hidden">
                 <img src={photoPreview} alt="preview" className="w-full h-40 object-cover" />
@@ -230,12 +229,12 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
                   className="absolute top-2 right-2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">×</button>
               </div>
             ) : (
-              <button type="button" onClick={() => cameraRef.current?.click()}
-                className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-6 active:scale-95 transition-all">
+              <label htmlFor="add-item-photo"
+                className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-6 cursor-pointer active:scale-95 transition-all">
                 <CameraIcon className="w-7 h-7 text-teal-500" />
                 <span className="text-sm font-bold text-teal-700">写真を追加</span>
                 <span className="text-xs text-teal-500">Add a Photo</span>
-              </button>
+              </label>
             )}
           </div>
 
