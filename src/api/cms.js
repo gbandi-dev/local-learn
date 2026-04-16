@@ -108,7 +108,15 @@ export async function createCmsItem(type, data) {
     throw new Error(`CMS ${res.status}: ${text}`)
   }
 
-  return res.json()
+  const created = await res.json()
+
+  // Auto-publish so it appears on the map immediately
+  await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items/${created.id}/publish`,
+    { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` } }
+  ).catch(() => null) // non-fatal if publish fails
+
+  return created
 }
 
 /**
