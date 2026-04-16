@@ -17,14 +17,37 @@ const EMPTY_MENTOR = {
   'available-when':   '',
 }
 
-export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmit }) {
+export default function AddItemModal({ type, coords: initialCoords, onClose, onSuccess, onSubmit }) {
   const isSpot = type === 'spot'
   const [form,       setForm]       = useState(isSpot ? EMPTY_SPOT : EMPTY_MENTOR)
+  const [coords,     setCoords]     = useState(initialCoords)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoError,   setGeoError]   = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState(null)
   const [done,       setDone]       = useState(false)
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
+
+  function handleGeolocate() {
+    if (!navigator.geolocation) {
+      setGeoError('このブラウザは位置情報をサポートしていません / Geolocation not supported')
+      return
+    }
+    setGeoLoading(true)
+    setGeoError(null)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setGeoLoading(false)
+      },
+      () => {
+        setGeoError('位置情報の取得に失敗しました / Could not get location')
+        setGeoLoading(false)
+      },
+      { timeout: 10000 }
+    )
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -66,18 +89,34 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
 
           {/* Location */}
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Location / 場所</p>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">場所 / Location</p>
             <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
               <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-              <span className="text-sm font-mono text-green-800">{coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}</span>
+              <span className="flex-1 text-sm font-mono text-green-800">{coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}</span>
             </div>
+            <button
+              type="button"
+              onClick={handleGeolocate}
+              disabled={geoLoading}
+              className="mt-2 w-full flex items-center justify-center gap-2 py-2 rounded-xl border-2 border-teal-200 bg-teal-50 text-teal-700 text-xs font-semibold hover:bg-teal-100 active:scale-95 transition-all disabled:opacity-50"
+            >
+              {geoLoading ? (
+                <span className="w-3.5 h-3.5 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="9" strokeOpacity="0.3"/>
+                </svg>
+              )}
+              <span>現在地を使う / Use My Location</span>
+            </button>
+            {geoError && <p className="mt-1 text-xs text-red-600">{geoError}</p>}
           </div>
 
           {/* Name / Username */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
-              {isSpot ? 'Username / ユーザー名' : 'Name / 名前'}
-              <span className="text-red-400 normal-case font-normal ml-1">required</span>
+              {isSpot ? 'ユーザー名 / Username' : '名前 / Name'}
+              <span className="text-red-400 normal-case font-normal ml-1">必須 / required</span>
             </label>
             <input
               type="text"
@@ -92,7 +131,7 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
           {/* Category (spots only) */}
           {isSpot && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Category / カテゴリ</p>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">カテゴリ / Category</p>
               <div className="grid grid-cols-3 gap-2">
                 {CATEGORIES.map((cat) => {
                   const active = form.category === cat
@@ -101,8 +140,8 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
                       className={`py-2.5 rounded-xl border-2 text-xs font-semibold transition-all active:scale-95 ${
                         active ? 'bg-teal-700 border-teal-700 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-300'
                       }`}>
-                      <span className="block">{cat}</span>
-                      <span className={`block text-xs ${active ? 'text-teal-200' : 'text-gray-400'}`}>{CATEGORY_JA[cat]}</span>
+                      <span className="block">{CATEGORY_JA[cat]}</span>
+                      <span className={`block text-xs ${active ? 'text-teal-200' : 'text-gray-400'}`}>{cat}</span>
                     </button>
                   )
                 })}
@@ -113,21 +152,21 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
           {/* Description */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
-              {isSpot ? 'Area Description / エリアの説明' : 'What I Can Teach / 教えられること'}
+              {isSpot ? 'エリアの説明 / Area Description' : '教えられること / What I Can Teach'}
             </label>
             <textarea
               value={isSpot ? form['area-description'] : form['what-i-can-teach']}
               onChange={(e) => set(isSpot ? 'area-description' : 'what-i-can-teach', e.target.value)}
               rows={3}
               className="w-full border-2 border-gray-200 focus:border-teal-600 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none"
-              placeholder={isSpot ? 'Brief description of this spot…' : 'What can you teach or share…'}
+              placeholder={isSpot ? '場所の説明を入力…' : '教えられることを入力…'}
             />
           </div>
 
           {/* Languages (mentors only) */}
           {!isSpot && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Language / 言語</p>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">言語 / Language</p>
               <div className="flex gap-3 flex-wrap">
                 {LANG_OPTIONS.map((lang) => (
                   <button key={lang} type="button" onClick={() => set('languages', lang)}
@@ -144,19 +183,19 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
           {/* Available When (mentors only) */}
           {!isSpot && (
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Available When / 活動できる時間</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">活動できる時間 / Available When</label>
               <input
                 type="text"
                 value={form['available-when']}
                 onChange={(e) => set('available-when', e.target.value)}
                 className="w-full border-2 border-gray-200 focus:border-teal-600 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                placeholder="e.g. Weekends, afternoons / 週末・午後"
+                placeholder="例：週末・午後 / e.g. Weekends, afternoons"
               />
             </div>
           )}
 
           {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{error}</div>}
-          {done  && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-700 font-medium">Saved! Refreshing map…</div>}
+          {done  && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-700 font-medium">保存しました！/ Saved! Refreshing map…</div>}
         </div>
 
         {/* Footer */}
