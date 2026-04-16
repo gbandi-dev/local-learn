@@ -184,13 +184,14 @@ export default function App() {
   )
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex justify-center bg-gray-200 min-h-screen">
+    <div className="flex flex-col h-screen w-full max-w-screen-lg overflow-hidden shadow-2xl">
 
       {/* ── Header ─────────────────────────────── */}
       <header className="bg-teal-700 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-lg z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-inner">
-            <KitaMascot className="w-9 h-9" />
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 shadow-inner overflow-hidden">
+            <img src="/local-learn/mascot.png" alt="mascot" className="w-10 h-10 object-contain" />
           </div>
           <div>
             <h1 className="font-bold text-sm leading-tight">ローカルラーン</h1>
@@ -269,6 +270,7 @@ export default function App() {
           onSubmit={handleSubmit}
         />
       )}
+    </div>
     </div>
   )
 }
