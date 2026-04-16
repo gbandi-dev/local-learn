@@ -278,7 +278,7 @@ export default function App() {
               <button onClick={() => startAdding('spot')}
                 className="w-full flex items-center gap-2 justify-center py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 active:scale-95 text-white text-sm font-semibold transition-all">
                 <IconPlus className="w-4 h-4" />
-                <div className="text-left">
+                <div className="text-center">
                   <p className="text-xs font-bold leading-none">場所を追加</p>
                   <p className="text-xs opacity-70">Add a Place</p>
                 </div>
@@ -286,7 +286,7 @@ export default function App() {
               <button onClick={() => startAdding('mentor')}
                 className="w-full flex items-center gap-2 justify-center py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 active:scale-95 text-white text-sm font-semibold transition-all">
                 <IconPlus className="w-4 h-4" />
-                <div className="text-left">
+                <div className="text-center">
                   <p className="text-xs font-bold leading-none">まちの人を追加</p>
                   <p className="text-xs opacity-70">Add a Person</p>
                 </div>
@@ -294,9 +294,9 @@ export default function App() {
               <button onClick={() => startAdding('log')}
                 className="w-full flex items-center gap-2 justify-center py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-sm font-semibold transition-all">
                 <IconPlus className="w-4 h-4" />
-                <div className="text-left">
+                <div className="text-center">
                   <p className="text-xs font-bold leading-none">学びを記録する</p>
-                  <p className="text-xs opacity-70">Add a Learning Record</p>
+                  <p className="text-xs opacity-70">Add a Record</p>
                 </div>
               </button>
             </>

@@ -108,7 +108,7 @@ function LocationButton({ mapRef, pickingLocation, onMapClick }) {
       onClick={handleClick}
       disabled={loading}
       title="現在地を表示 / My Location"
-      className="absolute bottom-[130px] right-3 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center active:scale-95 transition-all disabled:opacity-50"
+      className="absolute bottom-[200px] right-3 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center active:scale-95 transition-all disabled:opacity-50"
     >
       {loading ? (
         <span className="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
