@@ -306,7 +306,35 @@ export default function App() {
 
         {/* Mobile content */}
         <div className="flex flex-1 overflow-hidden flex-col min-h-0">
-          {mobileView === 'map'        && <div className="flex-1 w-full">{mapEl}</div>}
+          {mobileView === 'map' && (
+            <div className="flex-1 w-full relative">
+              {mapEl}
+              {!pickingLocation && (
+                <div className="absolute bottom-20 left-3 z-10 flex flex-col gap-2">
+                  <button
+                    onClick={() => startAdding('spot')}
+                    className="flex items-center gap-2 px-3 py-2 bg-blue-500 active:bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg"
+                  >
+                    <IconPlus className="w-3.5 h-3.5 shrink-0" />
+                    <div className="text-left leading-tight">
+                      <p>場所を追加</p>
+                      <p className="opacity-70 font-normal">Add a Place</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => startAdding('mentor')}
+                    className="flex items-center gap-2 px-3 py-2 bg-orange-500 active:bg-orange-600 text-white text-xs font-bold rounded-full shadow-lg"
+                  >
+                    <IconPlus className="w-3.5 h-3.5 shrink-0" />
+                    <div className="text-left leading-tight">
+                      <p>まちの人を追加</p>
+                      <p className="opacity-70 font-normal">Add a Person</p>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           {mobileView === 'list'       && <div className="flex flex-1 overflow-hidden w-full">{mobileSidebarEl}</div>}
           {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
           {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}

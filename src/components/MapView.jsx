@@ -161,8 +161,8 @@ export default function MapView({
             <div className="text-3xl mb-3">📍</div>
             <p className="text-sm font-bold text-gray-800">まだ場所がありません</p>
             <p className="text-xs text-gray-500 mt-1">No places added yet</p>
-            <p className="text-xs text-teal-700 font-medium mt-3">「＋ 場所を追加」から最初の場所を登録しましょう！</p>
-            <p className="text-xs text-gray-400 mt-0.5">Use "Add a Place" to register the first spot</p>
+            <p className="text-xs text-teal-700 font-medium mt-3">左下のボタンから最初の場所を登録しましょう！</p>
+            <p className="text-xs text-gray-400 mt-0.5">Use the buttons below-left to add the first spot</p>
           </div>
         </div>
       )}
