@@ -7,11 +7,7 @@ const FEATURES = [
 ]
 
 export default function WelcomeOverlay({ onDismiss }) {
-  // If already dismissed, render nothing
-  if (localStorage.getItem('ll-welcomed') === '1') return null
-
   function handleDismiss() {
-    localStorage.setItem('ll-welcomed', '1')
     onDismiss()
   }
 

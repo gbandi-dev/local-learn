@@ -30,7 +30,7 @@ const MAP_STYLE = {
   ],
 }
 
-const INITIAL_VIEW = { longitude: 132.334, latitude: 34.674, zoom: 13 }
+const INITIAL_VIEW = { longitude: 132.53736, latitude: 34.67402, zoom: 15 }
 
 const TYPE_COLOR = { spot: '#3b82f6', mentor: '#f97316' }
 const TYPE_LABEL = { spot: '場', mentor: '人' }

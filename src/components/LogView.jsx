@@ -175,7 +175,7 @@ export default function LogView({ onSubmit }) {
         <Section num="4" ja="日付" en="Date">
           <input type="date" value={form.date}
             onChange={(e) => set('date', e.target.value)}
-            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
+            className="w-full min-w-0 border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors box-border" />
         </Section>
 
         {/* 5. 学んだこと */}

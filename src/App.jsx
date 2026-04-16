@@ -212,7 +212,7 @@ export default function App() {
           className="px-4 py-5 border-b border-teal-700/60 cursor-pointer select-none"
           onClick={handleLogoClick}
         >
-          <div className="flex items-center gap-3 mb-1">
+          <div className="flex items-center gap-3 mb-1 relative">
             <div className="w-10 h-10 rounded-full bg-white overflow-hidden shrink-0">
               <img src={`${import.meta.env.BASE_URL}mascot.png`} alt="mascot" className="w-10 h-10 object-contain" />
             </div>
@@ -220,6 +220,7 @@ export default function App() {
               <p className="font-bold text-sm leading-tight">ローカルラーン</p>
               <p className="text-teal-300 text-xs">Local Learn</p>
             </div>
+            <span className="ml-auto text-xs font-bold bg-teal-500 text-white px-2 py-0.5 rounded-full">Beta</span>
           </div>
           <p className="text-teal-400 text-xs mt-1">北広島町 · Kitahiroshimacho</p>
         </div>
@@ -287,6 +288,7 @@ export default function App() {
               <p className="text-teal-200 text-xs">北広島町</p>
             </div>
           </div>
+          <span className="text-xs font-bold bg-teal-500 text-white px-2 py-0.5 rounded-full">Beta</span>
         </header>
 
         {/* Mobile top nav tabs */}
