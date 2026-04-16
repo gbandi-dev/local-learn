@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { fetchCmsItems, deleteCmsItem, publishCmsItem } from '../api/cms'
 
 const TABS = [
@@ -95,23 +95,10 @@ function ItemCard({ item, type, onPublish, onDelete }) {
 }
 
 export default function AdminPage({ onClose }) {
-  const [authenticated, setAuthenticated] = useState(false)
-  const [passwordInput, setPasswordInput] = useState('')
-  const [loginError,    setLoginError]    = useState('')
-  const [activeTab,     setActiveTab]     = useState('spot')
-  const [items,         setItems]         = useState([])
-  const [loading,       setLoading]       = useState(false)
-  const [error,         setError]         = useState('')
-
-  function handleLogin(e) {
-    e.preventDefault()
-    if (passwordInput === import.meta.env.VITE_ADMIN_PASSWORD) {
-      setAuthenticated(true)
-      setLoginError('')
-    } else {
-      setLoginError('パスワードが正しくありません / Incorrect password')
-    }
-  }
+  const [activeTab, setActiveTab] = useState('spot')
+  const [items,     setItems]     = useState([])
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState('')
 
   async function loadItems(type) {
     setLoading(true)
@@ -128,10 +115,8 @@ export default function AdminPage({ onClose }) {
   }
 
   useEffect(() => {
-    if (authenticated) {
-      loadItems(activeTab)
-    }
-  }, [authenticated, activeTab])
+    loadItems(activeTab)
+  }, [activeTab])
 
   async function handlePublish(itemId) {
     await publishCmsItem(activeTab, itemId)
@@ -143,52 +128,6 @@ export default function AdminPage({ onClose }) {
     setItems((prev) => prev.filter((item) => item.id !== itemId))
   }
 
-  // ── Login screen ───────────────────────────────────────────────────────────
-  if (!authenticated) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-          <div className="bg-teal-700 px-6 py-4">
-            <h2 className="text-white font-bold text-lg">管理ページ / Admin</h2>
-            <p className="text-teal-200 text-xs mt-0.5">北広島町ローカルラーン</p>
-          </div>
-          <form onSubmit={handleLogin} className="px-6 py-6 space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                パスワード / Password
-              </label>
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                placeholder="••••••••"
-                autoFocus
-              />
-            </div>
-            {loginError && (
-              <p className="text-xs text-red-600 font-medium">{loginError}</p>
-            )}
-            <button
-              type="submit"
-              className="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl transition-colors text-sm"
-            >
-              ログイン / Login
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full py-2 text-gray-500 hover:text-gray-700 text-sm transition-colors"
-            >
-              キャンセル / Cancel
-            </button>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Authenticated admin panel ──────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-gray-50">
       {/* Header */}
