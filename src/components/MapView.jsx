@@ -164,12 +164,18 @@ export default function MapView({
       {/* Legend */}
       <div className="absolute bottom-8 right-3 z-10 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg px-3 py-2.5 text-xs text-gray-700 space-y-2">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">S</div>
-          <span>Learning Spot</span>
+          <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">場</div>
+          <div>
+            <p className="font-bold leading-none">まちの場所</p>
+            <p className="text-gray-400 text-xs">Place in Town</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">M</div>
-          <span>Mentor</span>
+          <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">人</div>
+          <div>
+            <p className="font-bold leading-none">まちの人</p>
+            <p className="text-gray-400 text-xs">Person in Town</p>
+          </div>
         </div>
       </div>
     </div>

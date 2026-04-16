@@ -30,16 +30,18 @@ const LANG_OPTIONS = [
 ]
 
 const EMPTY_SPOT = {
-  username:         '',
+  username:           '',
   'area-description': '',
-  category:         '',
-  'recommended-for': [],
+  category:           '',
+  'recommended-for':  [],
+  'location-name':    '',
 }
 const EMPTY_MENTOR = {
-  name:              '',
+  name:               '',
   'what-i-can-teach': '',
-  languages:         'Japanese',
-  'available-when':  '',
+  languages:          'Japanese',
+  'available-when':   '',
+  'location-name':    '',
 }
 
 // ── Icons ────────────────────────────────────────────────────────────────────
@@ -118,14 +120,15 @@ export default function ReportView({ onSubmit, onViewMap }) {
   const cameraRef  = useRef()
   const galleryRef = useRef()
 
-  useEffect(() => {
+  function captureGPS() {
     if (!navigator.geolocation) { setLocStatus('error'); return }
+    setLocStatus('finding')
     navigator.geolocation.getCurrentPosition(
       (p) => { setCoords({ lat: p.coords.latitude, lng: p.coords.longitude }); setLocStatus('found') },
       ()  => setLocStatus('error'),
       { enableHighAccuracy: true, timeout: 12000 }
     )
-  }, [])
+  }
 
   function selectType(t) {
     setType(t)
@@ -350,30 +353,48 @@ export default function ReportView({ onSubmit, onViewMap }) {
           </>
         )}
 
-        {/* ── GPS ─────────────────────────────────── */}
-        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
-          locStatus === 'found'   ? 'bg-green-50 border-green-200' :
-          locStatus === 'error'   ? 'bg-amber-50 border-amber-200' :
-                                    'bg-gray-50 border-gray-200'
-        }`}>
-          {locStatus === 'finding' && <div className="w-3 h-3 border-2 border-teal-600 border-t-transparent rounded-full animate-spin shrink-0" />}
-          {locStatus === 'found'   && <div className="w-3 h-3 rounded-full bg-green-500 shrink-0" />}
-          {locStatus === 'error'   && <div className="w-3 h-3 rounded-full bg-amber-500 shrink-0" />}
-          <div>
-            <p className={`text-xs font-bold ${
-              locStatus === 'found' ? 'text-green-700' : locStatus === 'error' ? 'text-amber-700' : 'text-gray-500'
-            }`}>
-              {locStatus === 'finding' ? '位置情報を取得中…' : locStatus === 'found' ? 'GPS取得済み' : '位置情報が利用できません'}
-            </p>
-            <p className="text-xs text-gray-400">
-              {locStatus === 'found' && coords
-                ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`
-                : locStatus === 'error'
-                ? 'デフォルト位置（北広島町）を使用します'
-                : 'Detecting location…'}
-            </p>
-          </div>
-        </div>
+        {/* ── 位置情報 ─────────────────────────────── */}
+        {type && (
+          <Section num={type === 'spot' ? '7' : '7'} ja="場所" en="Location">
+            {/* GPS button */}
+            <button
+              onClick={captureGPS}
+              disabled={locStatus === 'finding'}
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-semibold text-sm transition-all active:scale-95 mb-3 ${
+                locStatus === 'found'
+                  ? 'border-green-300 bg-green-50 text-green-700'
+                  : locStatus === 'finding'
+                  ? 'border-teal-200 bg-teal-50 text-teal-600 cursor-wait'
+                  : 'border-dashed border-gray-300 bg-gray-50 text-gray-600 hover:border-teal-400 hover:bg-teal-50'
+              }`}
+            >
+              {locStatus === 'finding' ? (
+                <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <span className="text-base">📍</span>
+              )}
+              <div className="text-left">
+                <p className="font-bold leading-none">
+                  {locStatus === 'found' ? 'GPS取得済み' : locStatus === 'finding' ? '取得中…' : 'GPS自動取得'}
+                </p>
+                <p className="text-xs opacity-60 mt-0.5">
+                  {locStatus === 'found' && coords
+                    ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`
+                    : 'Auto-capture GPS location'}
+                </p>
+              </div>
+            </button>
+
+            {/* Landmark text input */}
+            <input
+              type="text"
+              value={form['location-name']}
+              onChange={(e) => set('location-name', e.target.value)}
+              className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+              placeholder="目印・住所（任意）/ Landmark or street name"
+            />
+          </Section>
+        )}
 
         {formError && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{formError}</div>
