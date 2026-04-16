@@ -6,6 +6,35 @@ import AddItemModal from './components/AddItemModal'
 import { useGeoData } from './hooks/useGeoData'
 import { createCmsItem, isCmsConfigured } from './api/cms'
 
+// ── Kitahiroshimacho mascot (cow character) ─────────────────────────────────
+function KitaMascot({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" fill="none">
+      {/* Horns */}
+      <path d="M14 12 Q11 5 7 7" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M34 12 Q37 5 41 7" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Ears */}
+      <ellipse cx="10" cy="18" rx="6" ry="7.5" fill="white"/>
+      <ellipse cx="38" cy="18" rx="6" ry="7.5" fill="white"/>
+      <ellipse cx="10" cy="18" rx="3.5" ry="5" fill="#fda4af"/>
+      <ellipse cx="38" cy="18" rx="3.5" ry="5" fill="#fda4af"/>
+      {/* Head */}
+      <circle cx="24" cy="28" r="16" fill="white"/>
+      {/* Patch */}
+      <ellipse cx="30" cy="24" rx="5" ry="4" fill="#d1fae5" transform="rotate(-15 30 24)"/>
+      {/* Eyes */}
+      <circle cx="18.5" cy="25" r="3.5" fill="#1c1917"/>
+      <circle cx="29.5" cy="25" r="3.5" fill="#1c1917"/>
+      <circle cx="19.5" cy="23.8" r="1.2" fill="white"/>
+      <circle cx="30.5" cy="23.8" r="1.2" fill="white"/>
+      {/* Nose */}
+      <ellipse cx="24" cy="33" rx="6.5" ry="4.5" fill="#fda4af"/>
+      <circle cx="21.5" cy="33" r="1.8" fill="#f43f5e"/>
+      <circle cx="26.5" cy="33" r="1.8" fill="#f43f5e"/>
+    </svg>
+  )
+}
+
 // ── Icons for bottom nav ────────────────────────────────────────────────────
 function IconCamera({ className }) {
   return (
@@ -160,12 +189,12 @@ export default function App() {
       {/* ── Header ─────────────────────────────── */}
       <header className="bg-teal-700 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-lg z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold shrink-0">
-            LL
+          <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-inner">
+            <KitaMascot className="w-9 h-9" />
           </div>
           <div>
-            <h1 className="font-bold text-sm leading-tight">Local Learn</h1>
-            <p className="text-teal-200 text-xs">ローカルラーン · 北広島町</p>
+            <h1 className="font-bold text-sm leading-tight">ローカルラーン</h1>
+            <p className="text-teal-200 text-xs">Local Learn · 北広島町</p>
           </div>
         </div>
 
