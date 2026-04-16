@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import MapView from './components/MapView'
 import Sidebar from './components/Sidebar'
 import ReportView from './components/ReportView'
+import LogView from './components/LogView'
 import AddItemModal from './components/AddItemModal'
 import { useGeoData } from './hooks/useGeoData'
 import { createCmsItem, isCmsConfigured } from './api/cms'
@@ -119,9 +120,13 @@ export default function App() {
     setAddingType(null); setPickingLocation(false); setDraftCoords(null)
   }
   function goTab(id) {
-    setMobileView(id)
-    if (id === 'list') setTab('mentors')
-    if (id === 'map')  setTab('all')
+    if (id === 'report') {
+      setMobileView('report-log')
+    } else {
+      setMobileView(id)
+      if (id === 'list') setTab('mentors')
+      if (id === 'map')  setTab('all')
+    }
   }
 
   const mapEl = (
@@ -171,7 +176,7 @@ export default function App() {
           {NAV.map(({ id, ja, en, Icon }) => (
             <button key={id} onClick={() => goTab(id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                mobileView === id
+                (mobileView === id || (id === 'report' && mobileView === 'report-log'))
                   ? 'bg-white/15 text-white font-bold'
                   : 'text-teal-200 hover:bg-white/10 hover:text-white'
               }`}>
@@ -233,7 +238,7 @@ export default function App() {
           {NAV.map(({ id, ja, en, Icon }) => (
             <button key={id} onClick={() => goTab(id)}
               className={`flex-1 py-2.5 flex flex-col items-center gap-0.5 transition-colors relative ${
-                mobileView === id ? 'text-teal-700' : 'text-gray-400'
+                (mobileView === id || (id === 'report' && mobileView === 'report-log')) ? 'text-teal-700' : 'text-gray-400'
               }`}>
               <Icon className="w-4 h-4" />
               <span className="text-xs font-bold leading-none">{ja}</span>
@@ -244,17 +249,28 @@ export default function App() {
         </nav>
 
         {/* Mobile content */}
-        <div className="flex flex-1 overflow-hidden flex-col">
-          {mobileView === 'map'    && <div className="flex-1 relative">{mapEl}</div>}
-          {mobileView === 'list'   && <div className="flex flex-1 overflow-hidden">{React.cloneElement(sidebarEl, { isOpen: true })}</div>}
-          {mobileView === 'report' && <ReportView onSubmit={handleSubmit} onViewMap={() => setMobileView('map')} />}
+        <div className="flex flex-1 overflow-hidden flex-col min-h-0">
+          {mobileView === 'map'        && <div className="flex-1 relative overflow-hidden">{mapEl}</div>}
+          {mobileView === 'list'       && <div className="flex flex-1 overflow-hidden">{React.cloneElement(sidebarEl, { isOpen: true })}</div>}
+          {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
+          {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
         </div>
       </div>
 
-      {/* ── Desktop main area (sidebar + map) ─── */}
+      {/* ── Desktop main area ──────────────────── */}
       <div className="hidden md:flex flex-1 overflow-hidden">
-        {sidebarEl}
-        {mapEl}
+        {mobileView === 'report' && (
+          <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />
+        )}
+        {mobileView === 'report-log' && (
+          <LogView onSubmit={handleSubmit} />
+        )}
+        {(mobileView === 'map' || mobileView === 'list') && (
+          <>
+            {sidebarEl}
+            {mapEl}
+          </>
+        )}
       </div>
 
       {addingType && draftCoords && (
