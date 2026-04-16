@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 const TYPES = [
-  { id: 'spot',   ja: '学習スポット',       en: 'Learning Spot',    color: '#3b82f6' },
-  { id: 'mentor', ja: 'コミュニティメンター', en: 'Community Mentor', color: '#f97316' },
+  { id: 'spot',   ja: 'まちの場所', en: 'Place in Town',  color: '#3b82f6' },
+  { id: 'mentor', ja: 'まちの人',   en: 'Person in Town', color: '#f97316' },
 ]
 
 const CATEGORIES = [

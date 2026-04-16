@@ -33,7 +33,7 @@ const MAP_STYLE = {
 const INITIAL_VIEW = { longitude: 132.334, latitude: 34.674, zoom: 13 }
 
 const TYPE_COLOR = { spot: '#3b82f6', mentor: '#f97316' }
-const TYPE_LABEL = { spot: 'S', mentor: 'M' }
+const TYPE_LABEL = { spot: '場', mentor: '人' }
 
 function Pin({ type, selected, demo }) {
   const color = TYPE_COLOR[type] ?? '#6b7280'

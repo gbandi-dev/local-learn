@@ -1,11 +1,11 @@
 const CATEGORIES = [
-  { id: 'all',      en: 'All',      ja: 'すべて' },
-  { id: 'Nature',   en: 'Nature',   ja: '自然' },
-  { id: 'Workshop', en: 'Workshop', ja: 'ワーク' },
-  { id: 'Culture',  en: 'Culture',  ja: '文化' },
-  { id: 'Sports',   en: 'Sports',   ja: '運動' },
-  { id: 'Library',  en: 'Library',  ja: '図書' },
-  { id: 'Other',    en: 'Other',    ja: 'その他' },
+  { id: 'all',      ja: 'すべて',           en: 'All'      },
+  { id: 'Nature',   ja: '自然',             en: 'Nature'   },
+  { id: 'Workshop', ja: 'ワークショップ',   en: 'Workshop' },
+  { id: 'Culture',  ja: '文化',             en: 'Culture'  },
+  { id: 'Sports',   ja: 'スポーツ',         en: 'Sports'   },
+  { id: 'Library',  ja: '図書・学習',       en: 'Library'  },
+  { id: 'Other',    ja: 'その他',           en: 'Other'    },
 ]
 
 export default function FilterBar({ category, onCategory }) {
@@ -15,16 +15,13 @@ export default function FilterBar({ category, onCategory }) {
         <button
           key={cat.id}
           onClick={() => onCategory(cat.id)}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${
             category === cat.id
               ? 'bg-teal-700 text-white'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          {cat.en}
-          <span className={`ml-1 ${category === cat.id ? 'text-teal-200' : 'text-gray-400'}`}>
-            {cat.ja}
-          </span>
+          {cat.ja}
         </button>
       ))}
     </div>

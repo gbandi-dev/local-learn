@@ -55,8 +55,8 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
         {/* Header */}
         <div className={`flex items-center justify-between px-5 py-4 ${isSpot ? 'bg-blue-600' : 'bg-orange-500'} rounded-t-2xl sm:rounded-t-2xl`}>
           <div>
-            <h2 className="font-bold text-white text-base">{isSpot ? 'Add Learning Spot' : 'Add Community Mentor'}</h2>
-            <p className="text-white/70 text-xs mt-0.5">{isSpot ? '学習スポットを追加' : 'メンターを追加'}</p>
+            <h2 className="font-bold text-white text-base">{isSpot ? 'まちの場所を追加' : 'まちの人を追加'}</h2>
+            <p className="text-white/70 text-xs mt-0.5">{isSpot ? 'Place in Town' : 'Person in Town'}</p>
           </div>
           <button onClick={onClose} className="text-white/80 hover:text-white text-2xl leading-none">×</button>
         </div>
@@ -163,11 +163,11 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
         <div className="px-5 py-4 border-t border-gray-100 flex gap-3">
           <button type="button" onClick={onClose}
             className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-600 hover:border-gray-300 active:scale-95 transition-all">
-            Cancel
+            キャンセル
           </button>
           <button onClick={handleSubmit} disabled={submitting || done || !nameVal?.trim()}
             className="flex-1 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed bg-teal-700 hover:bg-teal-800">
-            {submitting ? 'Saving…' : 'Save'}
+            {submitting ? '保存中…' : '保存する'}
           </button>
         </div>
       </div>
