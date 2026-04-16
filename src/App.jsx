@@ -128,14 +128,11 @@ export default function App() {
   async function handleSubmit(type, formData, coords) {
     const finalCoords = coords ?? { lat: 34.674, lng: 132.334 }
     if (isCmsConfigured()) {
-      try {
-        await createCmsItem(type, { ...formData, ...finalCoords })
-        refresh()
-        return
-      } catch (e) {
-        console.warn('CMS write failed — saving locally:', e.message)
-      }
+      await createCmsItem(type, { ...formData, ...finalCoords })
+      refresh()
+      return
     }
+    // CMS not configured — save to local state only (dev/demo mode)
     const feature = makeFeature(type, formData, finalCoords)
     if (type === 'spot') setLocalSpots((s) => [...s, feature])
     else                 setLocalMentors((m) => [...m, feature])

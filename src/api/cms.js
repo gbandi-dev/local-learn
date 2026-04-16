@@ -43,10 +43,13 @@ async function uploadAsset(file) {
   try {
     const body = new FormData()
     body.append('file', file)
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 8000)
     const res = await fetch(
       `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/assets`,
-      { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body }
+      { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body, signal: controller.signal }
     )
+    clearTimeout(timer)
     if (!res.ok) return null
     const data = await res.json()
     return data.id ?? null
@@ -89,6 +92,8 @@ function buildFields(type, data) {
       { key: 'what-i-learned',      value: data['what-i-learned'] },
       { key: 'language-written-in', value: data['language-written-in'] },
       { key: 'teacher',             value: data.teacher },
+      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
+      hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
 
