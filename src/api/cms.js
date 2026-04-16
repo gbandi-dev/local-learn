@@ -21,9 +21,10 @@ const WORKSPACE = import.meta.env.VITE_REEARTH_WORKSPACE_ID
 const PROJECT   = import.meta.env.VITE_REEARTH_PROJECT_ID
 
 const MODEL_IDS = {
-  spot:   import.meta.env.VITE_REEARTH_SPOTS_MODEL_ID,
-  mentor: import.meta.env.VITE_REEARTH_MENTORS_MODEL_ID,
-  log:    import.meta.env.VITE_REEARTH_LOGS_MODEL_ID,
+  spot:    import.meta.env.VITE_REEARTH_SPOTS_MODEL_ID,
+  mentor:  import.meta.env.VITE_REEARTH_MENTORS_MODEL_ID,
+  log:     import.meta.env.VITE_REEARTH_LOGS_MODEL_ID,
+  comment: import.meta.env.VITE_REEARTH_COMMENTS_MODEL_ID,
 }
 
 export function isCmsConfigured() {
@@ -201,4 +202,72 @@ export async function publishCmsItem(type, itemId) {
   }
 
   return res.json().catch(() => null)
+}
+
+/**
+ * Fetch all comments for a given item ID.
+ *
+ * @param {string} itemId — the spot or mentor item ID
+ * @returns {Array} filtered comment items
+ */
+export async function fetchComments(itemId) {
+  if (!isCmsConfigured() || !MODEL_IDS.comment) return []
+
+  const res = await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${MODEL_IDS.comment}/items?page=1&perPage=100`,
+    { headers: { Authorization: `Bearer ${TOKEN}` } }
+  )
+  if (!res.ok) return []
+
+  const data = await res.json()
+  const items = data.items ?? []
+
+  return items.filter((item) => {
+    const field = item.fields?.find((f) => f.key === 'item-id')
+    return field?.value === itemId
+  })
+}
+
+/**
+ * Create and auto-publish a comment.
+ *
+ * @param {string} itemType — 'spot' or 'mentor'
+ * @param {string} itemId   — the parent item ID
+ * @param {string} author   — commenter's name
+ * @param {string} body     — comment text
+ */
+export async function createComment(itemType, itemId, author, body) {
+  if (!isCmsConfigured() || !MODEL_IDS.comment) {
+    throw new Error('Comments not configured.')
+  }
+
+  const fields = [
+    { key: 'author',    value: author },
+    { key: 'body',      value: body },
+    { key: 'date',      value: new Date().toISOString().split('T')[0] },
+    { key: 'item-id',   value: itemId },
+    { key: 'item-type', value: itemType },
+  ]
+
+  const res = await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${MODEL_IDS.comment}/items`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+      body: JSON.stringify({ fields }),
+    }
+  )
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText)
+    throw new Error(`CMS ${res.status}: ${text}`)
+  }
+  const created = await res.json()
+
+  // Auto-publish so it's immediately visible
+  await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${MODEL_IDS.comment}/items/${created.id}/publish`,
+    { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` } }
+  ).catch(() => null)
+
+  return created
 }

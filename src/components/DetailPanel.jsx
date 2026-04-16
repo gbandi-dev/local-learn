@@ -1,3 +1,5 @@
+import Comments from './Comments'
+
 const TYPE = {
   spot:   { ja: 'まちの場所', en: 'Place in Town',   bg: 'bg-blue-700',   pill: 'bg-blue-100 text-blue-700' },
   mentor: { ja: 'まちの人',   en: 'Person in Town',  bg: 'bg-orange-500', pill: 'bg-orange-100 text-orange-700' },
@@ -100,6 +102,13 @@ export default function DetailPanel({ item, onBack }) {
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
               ベータデータです。CMSにデータが登録されると自動的に置き換わります。
               <span className="block opacity-60 mt-0.5">Beta data — replaced once CMS is populated.</span>
+            </div>
+          )}
+
+          {/* Comments */}
+          {!item._demo && item.id && (
+            <div className="bg-gray-50 rounded-xl border border-gray-200 p-3">
+              <Comments itemId={item.id} itemType={item._type ?? 'spot'} />
             </div>
           )}
         </div>
