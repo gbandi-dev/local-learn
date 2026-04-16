@@ -29,7 +29,7 @@ export default function WelcomeOverlay({ onDismiss }) {
     return visitCount > MAX_AUTO ? (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 z-30 w-11 h-11 rounded-full bg-teal-700 hover:bg-teal-600 active:scale-95 text-white shadow-xl flex items-center justify-center text-base font-bold transition-all"
+        className="fixed top-20 right-3 z-40 w-10 h-10 rounded-full bg-teal-600 hover:bg-teal-500 active:scale-95 text-white shadow-xl flex items-center justify-center text-base font-bold transition-all border-2 border-white/30"
         aria-label="ヘルプ"
       >
         ?
