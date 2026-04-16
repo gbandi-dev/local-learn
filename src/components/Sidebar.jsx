@@ -10,7 +10,7 @@ const TABS = [
 export default function Sidebar({
   items, loading, error, selected, onSelect,
   category, onCategory, tab, onTab,
-  isOpen, onBack,
+  isOpen, onBack, onAddSpot, onAddMentor,
 }) {
   return (
     <div
@@ -43,6 +43,22 @@ export default function Sidebar({
                 {t.label}
               </button>
             ))}
+          </div>
+
+          {/* Add buttons — visible on mobile (sm:hidden hides them on desktop where header buttons show) */}
+          <div className="sm:hidden flex gap-2 px-3 py-2 border-b border-gray-100">
+            <button
+              onClick={onAddSpot}
+              className="flex-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white py-1.5 rounded-full transition-colors"
+            >
+              + Spot
+            </button>
+            <button
+              onClick={onAddMentor}
+              className="flex-1 text-xs font-medium bg-orange-500 hover:bg-orange-600 text-white py-1.5 rounded-full transition-colors"
+            >
+              + Mentor
+            </button>
           </div>
 
           {/* List */}
