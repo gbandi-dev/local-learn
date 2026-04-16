@@ -109,3 +109,96 @@ export async function createCmsItem(type, data) {
 
   return res.json()
 }
+
+/**
+ * Fetch all items for a given model type.
+ *
+ * @param {'spot' | 'mentor' | 'log'} type
+ * @returns {{ items: object[], totalCount: number }}
+ */
+export async function fetchCmsItems(type) {
+  if (!isCmsConfigured()) {
+    throw new Error('CMS not configured — check your .env file.')
+  }
+
+  const modelId = MODEL_IDS[type]
+  if (!modelId) throw new Error(`Unknown item type: ${type}`)
+
+  const res = await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items`,
+    {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText)
+    throw new Error(`CMS ${res.status}: ${text}`)
+  }
+
+  return res.json()
+}
+
+/**
+ * Delete an item from the CMS.
+ *
+ * @param {'spot' | 'mentor' | 'log'} type
+ * @param {string} itemId
+ */
+export async function deleteCmsItem(type, itemId) {
+  if (!isCmsConfigured()) {
+    throw new Error('CMS not configured — check your .env file.')
+  }
+
+  const modelId = MODEL_IDS[type]
+  if (!modelId) throw new Error(`Unknown item type: ${type}`)
+
+  const res = await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items/${itemId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText)
+    throw new Error(`CMS ${res.status}: ${text}`)
+  }
+}
+
+/**
+ * Publish an item so it appears in the public GeoJSON feed.
+ *
+ * @param {'spot' | 'mentor' | 'log'} type
+ * @param {string} itemId
+ */
+export async function publishCmsItem(type, itemId) {
+  if (!isCmsConfigured()) {
+    throw new Error('CMS not configured — check your .env file.')
+  }
+
+  const modelId = MODEL_IDS[type]
+  if (!modelId) throw new Error(`Unknown item type: ${type}`)
+
+  const res = await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items/${itemId}/publish`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText)
+    throw new Error(`CMS ${res.status}: ${text}`)
+  }
+
+  return res.json().catch(() => null)
+}

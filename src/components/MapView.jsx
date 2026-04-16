@@ -154,6 +154,19 @@ export default function MapView({
         })}
       </Map>
 
+      {/* Empty state overlay */}
+      {spots.length === 0 && mentors.length === 0 && !pickingLocation && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl px-6 py-5 max-w-xs text-center pointer-events-auto">
+            <div className="text-3xl mb-3">📍</div>
+            <p className="text-sm font-bold text-gray-800">まだ場所がありません</p>
+            <p className="text-xs text-gray-500 mt-1">No places added yet</p>
+            <p className="text-xs text-teal-700 font-medium mt-3">「＋ 場所を追加」から最初の場所を登録しましょう！</p>
+            <p className="text-xs text-gray-400 mt-0.5">Use "Add a Place" to register the first spot</p>
+          </div>
+        </div>
+      )}
+
       {/* Picking-location banner */}
       {pickingLocation && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-blue-800 text-white rounded-full px-5 py-2.5 shadow-xl text-sm font-semibold pointer-events-none select-none">

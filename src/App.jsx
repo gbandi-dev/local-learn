@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import MapView from './components/MapView'
 import Sidebar from './components/Sidebar'
 import ReportView from './components/ReportView'
 import LogView from './components/LogView'
 import AddItemModal from './components/AddItemModal'
+import AdminPage from './components/AdminPage'
+import WelcomeOverlay from './components/WelcomeOverlay'
 import { useGeoData } from './hooks/useGeoData'
 import { createCmsItem, isCmsConfigured } from './api/cms'
 
@@ -82,6 +84,25 @@ export default function App() {
   const [addingType,      setAddingType]      = useState(null)
   const [pickingLocation, setPickingLocation] = useState(false)
   const [draftCoords,     setDraftCoords]     = useState(null)
+  const [adminOpen,        setAdminOpen]       = useState(false)
+  const [showAdminPrompt,  setShowAdminPrompt] = useState(false)
+  const [adminPromptPw,    setAdminPromptPw]   = useState('')
+  const [adminPromptErr,   setAdminPromptErr]  = useState('')
+  const [welcomed,         setWelcomed]        = useState(false)
+
+  // Triple-click detection for logo
+  const logoClickCount = useRef(0)
+  const logoClickTimer = useRef(null)
+
+  function handleAdminPromptLogin(e) {
+    e.preventDefault()
+    if (adminPromptPw === import.meta.env.VITE_ADMIN_PASSWORD) {
+      setAdminOpen(true)
+      setShowAdminPrompt(false)
+    } else {
+      setAdminPromptErr('パスワードが正しくありません / Incorrect password')
+    }
+  }
 
   const allItems = [
     ...allSpots.map((f) => ({ ...f, _type: f._type ?? 'spot' })),
@@ -129,6 +150,22 @@ export default function App() {
     }
   }
 
+  function handleLogoClick() {
+    goTab('map')
+    logoClickCount.current += 1
+    if (logoClickTimer.current) clearTimeout(logoClickTimer.current)
+    logoClickTimer.current = setTimeout(() => {
+      logoClickCount.current = 0
+    }, 600)
+    if (logoClickCount.current >= 3) {
+      logoClickCount.current = 0
+      clearTimeout(logoClickTimer.current)
+      setShowAdminPrompt(true)
+      setAdminPromptPw('')
+      setAdminPromptErr('')
+    }
+  }
+
   const mapEl = (
     <MapView
       spots={allSpots} mentors={allMentors} selected={selected}
@@ -171,7 +208,10 @@ export default function App() {
       {/* ── Desktop left nav sidebar ───────────── */}
       <aside className="hidden md:flex flex-col w-52 bg-teal-800 text-white shrink-0">
         {/* Logo */}
-        <div className="px-4 py-5 border-b border-teal-700/60">
+        <div
+          className="px-4 py-5 border-b border-teal-700/60 cursor-pointer select-none"
+          onClick={handleLogoClick}
+        >
           <div className="flex items-center gap-3 mb-1">
             <div className="w-10 h-10 rounded-full bg-white overflow-hidden shrink-0">
               <img src={`${import.meta.env.BASE_URL}mascot.png`} alt="mascot" className="w-10 h-10 object-contain" />
@@ -235,7 +275,10 @@ export default function App() {
       {/* ── Mobile header ──────────────────────── */}
       <div className="md:hidden flex flex-col flex-1 overflow-hidden">
         <header className="bg-teal-700 text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-lg z-10">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 cursor-pointer select-none"
+            onClick={handleLogoClick}
+          >
             <div className="w-9 h-9 rounded-full bg-white overflow-hidden shrink-0">
               <img src={`${import.meta.env.BASE_URL}mascot.png`} alt="mascot" className="w-9 h-9 object-contain" />
             </div>
@@ -287,6 +330,55 @@ export default function App() {
           onSubmit={handleSubmit}
         />
       )}
+
+      {/* Admin password prompt modal */}
+      {showAdminPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div className="bg-teal-700 px-6 py-4">
+              <h2 className="text-white font-bold text-base">管理ページに入る / Enter Admin</h2>
+            </div>
+            <form onSubmit={handleAdminPromptLogin} className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  パスワード / Password
+                </label>
+                <input
+                  type="password"
+                  value={adminPromptPw}
+                  onChange={(e) => setAdminPromptPw(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="••••••••"
+                  autoFocus
+                />
+              </div>
+              {adminPromptErr && (
+                <p className="text-xs text-red-600 font-medium">{adminPromptErr}</p>
+              )}
+              <button
+                type="submit"
+                className="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl transition-colors text-sm"
+              >
+                ログイン
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAdminPrompt(false)}
+                className="w-full py-2 text-gray-500 hover:text-gray-700 text-sm transition-colors"
+              >
+                キャンセル
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin page full-screen overlay */}
+      {adminOpen && (
+        <AdminPage onClose={() => setAdminOpen(false)} />
+      )}
+
+      <WelcomeOverlay onDismiss={() => setWelcomed(true)} />
     </div>
     </div>
   )
