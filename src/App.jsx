@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import MapView from './components/MapView'
 import Sidebar from './components/Sidebar'
 import ReportView from './components/ReportView'
@@ -78,7 +78,7 @@ const NAV = [
 
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
-  const { spots, mentors, loading, error, usingDemo, refresh } = useGeoData()
+  const { spots, mentors, loading, error, refresh } = useGeoData()
 
   const [localSpots,   setLocalSpots]   = useState([])
   const [localMentors, setLocalMentors] = useState([])
@@ -97,7 +97,6 @@ export default function App() {
   const [showAdminPrompt,  setShowAdminPrompt] = useState(false)
   const [adminPromptPw,    setAdminPromptPw]   = useState('')
   const [adminPromptErr,   setAdminPromptErr]  = useState('')
-  const [welcomed,         setWelcomed]        = useState(false)
 
   // Triple-click detection for logo
   const logoClickCount = useRef(0)
@@ -420,7 +419,7 @@ export default function App() {
         <AdminPage onClose={() => setAdminOpen(false)} />
       )}
 
-      <WelcomeOverlay onDismiss={() => setWelcomed(true)} key="welcome" />
+      <WelcomeOverlay onDismiss={() => {}} mapActive={mobileView === 'map'} key="welcome" />
     </div>
     </div>
   )

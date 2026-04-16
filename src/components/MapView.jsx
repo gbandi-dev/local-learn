@@ -83,48 +83,41 @@ function Pin({ type, selected, demo }) {
   )
 }
 
-function GeolocateButton({ onLocate }) {
+function LocationButton({ mapRef, pickingLocation, onMapClick }) {
   const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState(null)
 
   function handleClick() {
-    if (!navigator.geolocation) {
-      setError('位置情報が使えません / Not supported')
-      return
-    }
+    if (!navigator.geolocation) return
     setLoading(true)
-    setError(null)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLoading(false)
-        onLocate({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        // Always fly the map to user's location
+        mapRef.current?.flyTo({ center: [coords.lng, coords.lat], zoom: 16, duration: 800 })
+        // If picking, also set the pin
+        if (pickingLocation && onMapClick) onMapClick(coords)
       },
-      () => {
-        setLoading(false)
-        setError('位置情報の取得に失敗 / Could not get location')
-      },
+      () => setLoading(false),
       { timeout: 10000 }
     )
   }
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <button
-        onClick={handleClick}
-        disabled={loading}
-        className="flex items-center gap-2 bg-white text-teal-700 font-bold text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-all disabled:opacity-50 pointer-events-auto"
-      >
-        {loading ? (
-          <span className="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
-        ) : (
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
-          </svg>
-        )}
-        現在地を使う / Use My Location
-      </button>
-      {error && <p className="text-xs text-red-200 bg-red-800/80 px-3 py-1 rounded-full">{error}</p>}
-    </div>
+    <button
+      onClick={handleClick}
+      disabled={loading}
+      title="現在地を表示 / My Location"
+      className="absolute bottom-[130px] right-3 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center active:scale-95 transition-all disabled:opacity-50"
+    >
+      {loading ? (
+        <span className="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+      ) : (
+        <svg className="w-5 h-5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        </svg>
+      )}
+    </button>
   )
 }
 
@@ -212,13 +205,13 @@ export default function MapView({
         </div>
       )}
 
+      {/* Persistent location button */}
+      <LocationButton mapRef={mapRef} pickingLocation={pickingLocation} onMapClick={onMapClick} />
+
       {/* Picking-location banner */}
       {pickingLocation && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 w-[90vw] max-w-sm">
-          <div className="bg-blue-800 text-white rounded-full px-5 py-2.5 shadow-xl text-sm font-semibold pointer-events-none select-none text-center">
-            地図をタップして場所を指定 · Tap the map to place pin
-          </div>
-          <GeolocateButton onLocate={onMapClick} />
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-blue-800 text-white rounded-full px-5 py-2.5 shadow-xl text-sm font-semibold pointer-events-none select-none text-center">
+          地図をタップ・または現在地ボタンで場所を指定
         </div>
       )}
 
