@@ -19,16 +19,27 @@ const CATEGORY_JA = {
 export default function Sidebar({
   spots, mentors, items, loading, error,
   selected, onSelect, category, onCategory,
-  tab, onTab, isOpen, onBack,
+  tab, onTab, isOpen, onBack, onHome,
   onAddSpot, onAddMentor,
 }) {
   return (
     <div className={`
       ${isOpen ? 'flex' : 'hidden'} md:flex
-      absolute inset-0 md:relative z-20 md:z-auto
-      w-full md:w-80 flex-col bg-gray-50
+      relative w-full md:w-80 flex-col bg-gray-50
       border-r border-gray-200 shrink-0 overflow-hidden
     `}>
+      {/* Mobile home button */}
+      {onHome && (
+        <button onClick={onHome}
+          className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-teal-700 text-white text-sm font-semibold shrink-0">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 19l-7-7 7-7"/>
+          </svg>
+          <span>地図に戻る</span>
+          <span className="text-teal-300 text-xs ml-1">Back to Map</span>
+        </button>
+      )}
+
       {selected ? (
         <DetailPanel item={selected} onBack={onBack} />
       ) : (

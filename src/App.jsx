@@ -151,6 +151,19 @@ export default function App() {
     />
   )
 
+  const mobileSidebarEl = (
+    <Sidebar
+      spots={allSpots} mentors={allMentors} items={allItems}
+      loading={loading} error={error} selected={selected}
+      onSelect={setSelected} category={category} onCategory={setCategory}
+      tab={tab} onTab={setTab} isOpen={true}
+      onBack={() => setSelected(null)}
+      onHome={() => goTab('map')}
+      onAddSpot={() => startAdding('spot')}
+      onAddMentor={() => startAdding('mentor')}
+    />
+  )
+
   return (
     <div className="flex justify-center bg-gray-300 h-screen">
     <div className="flex h-screen w-full max-w-screen-lg overflow-hidden shadow-2xl">
@@ -250,8 +263,8 @@ export default function App() {
 
         {/* Mobile content */}
         <div className="flex flex-1 overflow-hidden flex-col min-h-0">
-          {mobileView === 'map'        && <div className="flex-1 relative overflow-hidden">{mapEl}</div>}
-          {mobileView === 'list'       && <div className="flex flex-1 overflow-hidden">{React.cloneElement(sidebarEl, { isOpen: true })}</div>}
+          {mobileView === 'map'        && <div className="flex-1 w-full">{mapEl}</div>}
+          {mobileView === 'list'       && <div className="flex flex-1 overflow-hidden w-full">{mobileSidebarEl}</div>}
           {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
           {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
         </div>
@@ -259,17 +272,10 @@ export default function App() {
 
       {/* ── Desktop main area ──────────────────── */}
       <div className="hidden md:flex flex-1 overflow-hidden">
-        {mobileView === 'report' && (
-          <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />
-        )}
-        {mobileView === 'report-log' && (
-          <LogView onSubmit={handleSubmit} />
-        )}
+        {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
+        {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
         {(mobileView === 'map' || mobileView === 'list') && (
-          <>
-            {sidebarEl}
-            {mapEl}
-          </>
+          <>{sidebarEl}<div className="flex-1 h-full">{mapEl}</div></>
         )}
       </div>
 

@@ -107,7 +107,7 @@ export default function MapView({
   const visibleMentors = filterByCategory(mentors)
 
   return (
-    <div className="flex-1 relative">
+    <div className="w-full h-full relative">
       <Map
         ref={mapRef}
         initialViewState={INITIAL_VIEW}
