@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const CATEGORIES = ['Nature', 'Workshop', 'Culture', 'Sports', 'Library', 'Other']
-const CATEGORY_JA = { Nature: '自然', Workshop: 'ワーク', Culture: '文化', Sports: '運動', Library: '図書', Other: 'その他' }
+const CATEGORY_JA = { Nature: '自然', Workshop: 'ワークショップ', Culture: '文化', Sports: '運動', Library: '図書', Other: 'その他' }
 const LANG_OPTIONS = ['Japanese', 'English', 'Other']
 
 const EMPTY_SPOT = {

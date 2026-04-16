@@ -227,6 +227,7 @@ export default function MapView({
       {pickingLocation && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-blue-800 text-white rounded-full px-5 py-2.5 shadow-xl text-sm font-semibold pointer-events-none select-none text-center">
           地図をタップ・または現在地ボタンで場所を指定
+          <span className="block text-xs font-normal text-blue-200 mt-0.5">Tap the map or use the location button to set a pin</span>
         </div>
       )}
 
