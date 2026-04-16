@@ -32,7 +32,7 @@ export function isCmsConfigured() {
 }
 
 function geoPoint(lat, lng) {
-  return { lat, lng }
+  return { type: 'Point', coordinates: [lng, lat] }
 }
 
 /**
@@ -118,7 +118,8 @@ export async function createCmsItem(type, data) {
   let enrichedData = data
   if (data.photoFile instanceof File) {
     const photoAssetId = await uploadAsset(data.photoFile)
-    enrichedData = { ...data, photoAssetId }
+    // Re:Earth CMS asset fields expect an array of IDs
+    enrichedData = { ...data, photoAssetId: photoAssetId ? [photoAssetId] : null }
   }
 
   const fields = buildFields(type, enrichedData)
