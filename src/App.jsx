@@ -43,6 +43,14 @@ function IconPlus({ className }) {
     </svg>
   )
 }
+function IconPin({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+  )
+}
 
 // ── Build a local GeoJSON feature ─────────────────────────────────────────────
 function makeFeature(type, formData, coords) {
@@ -62,9 +70,10 @@ function makeFeature(type, formData, coords) {
 }
 
 const NAV = [
-  { id: 'map',    ja: '地図',       en: 'Map',     Icon: IconMap    },
-  { id: 'list',   ja: 'まちの人',   en: 'People',  Icon: IconPeople },
-  { id: 'report', ja: '学びの記録', en: 'Records', Icon: IconNote   },
+  { id: 'map',    ja: '地図',       en: 'Map',             Icon: IconMap    },
+  { id: 'places', ja: 'まちの場所', en: 'Places',          Icon: IconPin    },
+  { id: 'list',   ja: 'まちの人',   en: 'People',          Icon: IconPeople },
+  { id: 'report', ja: '学びの記録', en: 'Learning Record', Icon: IconNote   },
 ]
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -145,8 +154,9 @@ export default function App() {
       setMobileView('report-log')
     } else {
       setMobileView(id)
-      if (id === 'list') setTab('mentors')
-      if (id === 'map')  setTab('all')
+      if (id === 'places') setTab('spots')
+      if (id === 'list')   setTab('mentors')
+      if (id === 'map')    setTab('all')
     }
   }
 
@@ -301,7 +311,9 @@ export default function App() {
               <Icon className="w-4 h-4" />
               <span className="text-xs font-bold leading-none">{ja}</span>
               <span className="text-xs opacity-50 leading-none">{en}</span>
-              {mobileView === id && <div className="absolute bottom-0 inset-x-0 h-0.5 bg-teal-700" />}
+              {(mobileView === id || (id === 'report' && mobileView === 'report-log')) && (
+                <div className="absolute bottom-0 inset-x-0 h-0.5 bg-teal-700" />
+              )}
             </button>
           ))}
         </nav>
@@ -337,7 +349,7 @@ export default function App() {
               )}
             </div>
           )}
-          {mobileView === 'list'       && <div className="flex flex-1 overflow-hidden w-full">{mobileSidebarEl}</div>}
+          {(mobileView === 'list' || mobileView === 'places') && <div className="flex flex-1 overflow-hidden w-full">{mobileSidebarEl}</div>}
           {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
           {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
         </div>
@@ -347,7 +359,7 @@ export default function App() {
       <div className="hidden md:flex flex-1 overflow-hidden">
         {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
         {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
-        {(mobileView === 'map' || mobileView === 'list') && (
+        {(mobileView === 'map' || mobileView === 'list' || mobileView === 'places') && (
           <>{sidebarEl}<div className="flex-1 h-full">{mapEl}</div></>
         )}
       </div>
