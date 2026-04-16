@@ -2,30 +2,34 @@ import { useState } from 'react'
 
 const CATEGORIES = ['Nature', 'Workshop', 'Culture', 'Sports', 'Library', 'Other']
 const CATEGORY_JA = { Nature: '自然', Workshop: 'ワーク', Culture: '文化', Sports: '運動', Library: '図書', Other: 'その他' }
-const LANGS = ['Japanese', 'English', 'Other']
-const EMPTY = { name: '', name_ja: '', description: '', category: '', languages: ['Japanese'] }
+const LANG_OPTIONS = ['Japanese', 'English', 'Other']
+
+const EMPTY_SPOT = {
+  username:           '',
+  'area-description': '',
+  category:           '',
+  'recommended-for':  [],
+}
+const EMPTY_MENTOR = {
+  name:               '',
+  'what-i-can-teach': '',
+  languages:          'Japanese',
+  'available-when':   '',
+}
 
 export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmit }) {
-  const [form,       setForm]       = useState(EMPTY)
+  const isSpot = type === 'spot'
+  const [form,       setForm]       = useState(isSpot ? EMPTY_SPOT : EMPTY_MENTOR)
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState(null)
   const [done,       setDone]       = useState(false)
 
-  const isSpot = type === 'spot'
-
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
-  function toggleLang(lang) {
-    setForm((f) => ({
-      ...f,
-      languages: f.languages.includes(lang)
-        ? f.languages.filter((l) => l !== lang)
-        : [...f.languages, lang],
-    }))
-  }
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.name.trim() || !form.category) return
+    const name = isSpot ? form.username : form.name
+    if (!name?.trim()) return
     setSubmitting(true)
     setError(null)
     try {
@@ -38,6 +42,8 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
       setSubmitting(false)
     }
   }
+
+  const nameVal = isSpot ? form.username : form.name
 
   return (
     <div
@@ -67,61 +73,87 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
             </div>
           </div>
 
-          {/* Name */}
+          {/* Name / Username */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Name <span className="text-red-400 normal-case font-normal">required</span></label>
-            <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)} required
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+              {isSpot ? 'Username / ユーザー名' : 'Name / 名前'}
+              <span className="text-red-400 normal-case font-normal ml-1">required</span>
+            </label>
+            <input
+              type="text"
+              value={nameVal}
+              onChange={(e) => set(isSpot ? 'username' : 'name', e.target.value)}
+              required
               className="w-full border-2 border-gray-200 focus:border-teal-600 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-              placeholder="e.g. Kitahiroshima Town Library" />
+              placeholder={isSpot ? 'e.g. yamada_taro' : 'e.g. Hanako Yamada'}
+            />
           </div>
 
-          {/* Name JA */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">名前 (Japanese)</label>
-            <input type="text" value={form.name_ja} onChange={(e) => set('name_ja', e.target.value)}
-              className="w-full border-2 border-gray-200 focus:border-teal-600 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-              placeholder="例：北広島町立図書館" />
-          </div>
-
-          {/* Category */}
-          <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Category <span className="text-red-400 normal-case font-normal">required</span></p>
-            <div className="grid grid-cols-3 gap-2">
-              {CATEGORIES.map((cat) => {
-                const active = form.category === cat
-                return (
-                  <button key={cat} type="button" onClick={() => set('category', cat)}
-                    className={`py-2.5 rounded-xl border-2 text-xs font-semibold transition-all active:scale-95 ${
-                      active ? 'bg-teal-700 border-teal-700 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}>
-                    <span className="block">{cat}</span>
-                    <span className={`block text-xs ${active ? 'text-teal-200' : 'text-gray-400'}`}>{CATEGORY_JA[cat]}</span>
-                  </button>
-                )
-              })}
+          {/* Category (spots only) */}
+          {isSpot && (
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Category / カテゴリ</p>
+              <div className="grid grid-cols-3 gap-2">
+                {CATEGORIES.map((cat) => {
+                  const active = form.category === cat
+                  return (
+                    <button key={cat} type="button" onClick={() => set('category', cat)}
+                      className={`py-2.5 rounded-xl border-2 text-xs font-semibold transition-all active:scale-95 ${
+                        active ? 'bg-teal-700 border-teal-700 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}>
+                      <span className="block">{cat}</span>
+                      <span className={`block text-xs ${active ? 'text-teal-200' : 'text-gray-400'}`}>{CATEGORY_JA[cat]}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Description / 説明</label>
-            <textarea value={form.description} onChange={(e) => set('description', e.target.value)} rows={3}
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+              {isSpot ? 'Area Description / エリアの説明' : 'What I Can Teach / 教えられること'}
+            </label>
+            <textarea
+              value={isSpot ? form['area-description'] : form['what-i-can-teach']}
+              onChange={(e) => set(isSpot ? 'area-description' : 'what-i-can-teach', e.target.value)}
+              rows={3}
               className="w-full border-2 border-gray-200 focus:border-teal-600 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none"
-              placeholder="Brief description…" />
+              placeholder={isSpot ? 'Brief description of this spot…' : 'What can you teach or share…'}
+            />
           </div>
 
-          {/* Languages */}
-          <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Languages / 対応言語</p>
-            <div className="flex gap-4">
-              {LANGS.map((lang) => (
-                <label key={lang} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-                  <input type="checkbox" checked={form.languages.includes(lang)} onChange={() => toggleLang(lang)} className="w-4 h-4 accent-teal-600 rounded" />
-                  {lang}
-                </label>
-              ))}
+          {/* Languages (mentors only) */}
+          {!isSpot && (
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Language / 言語</p>
+              <div className="flex gap-3 flex-wrap">
+                {LANG_OPTIONS.map((lang) => (
+                  <button key={lang} type="button" onClick={() => set('languages', lang)}
+                    className={`px-4 py-2 rounded-xl border-2 text-xs font-semibold transition-all active:scale-95 ${
+                      form.languages === lang ? 'bg-teal-700 border-teal-700 text-white' : 'border-gray-200 text-gray-600'
+                    }`}>
+                    {lang}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Available When (mentors only) */}
+          {!isSpot && (
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Available When / 活動できる時間</label>
+              <input
+                type="text"
+                value={form['available-when']}
+                onChange={(e) => set('available-when', e.target.value)}
+                className="w-full border-2 border-gray-200 focus:border-teal-600 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+                placeholder="e.g. Weekends, afternoons / 週末・午後"
+              />
+            </div>
+          )}
 
           {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{error}</div>}
           {done  && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-700 font-medium">Saved! Refreshing map…</div>}
@@ -133,7 +165,7 @@ export default function AddItemModal({ type, coords, onClose, onSuccess, onSubmi
             className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-600 hover:border-gray-300 active:scale-95 transition-all">
             Cancel
           </button>
-          <button onClick={handleSubmit} disabled={submitting || done || !form.name.trim() || !form.category}
+          <button onClick={handleSubmit} disabled={submitting || done || !nameVal?.trim()}
             className="flex-1 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed bg-teal-700 hover:bg-teal-800">
             {submitting ? 'Saving…' : 'Save'}
           </button>

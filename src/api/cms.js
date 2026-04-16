@@ -3,10 +3,16 @@
  *
  * Environment variables (in .env locally, GitHub Secrets in CI):
  *   VITE_REEARTH_API_TOKEN        — Integration token (secret_…)
+ *   VITE_REEARTH_WORKSPACE_ID     — Workspace ID
  *   VITE_REEARTH_PROJECT_ID       — Project ID
  *   VITE_REEARTH_SPOTS_MODEL_ID   — Model ID for "learning-spots"
  *   VITE_REEARTH_MENTORS_MODEL_ID — Model ID for "community-mentors"
  *   VITE_REEARTH_LOGS_MODEL_ID    — Model ID for "learning-logs"
+ *
+ * Actual CMS field keys (from schema):
+ *   Learning Spots:   username, area-description, category, photo, location, recommended-for, submitted-by-user
+ *   Community Mentors: name, what-i-can-teach, languages, available-when, location
+ *   Learning Logs:    name, role, spot-visited, date, what-i-learned, photo, language-written-in, teacher
  */
 
 const BASE      = 'https://api.cms.reearth.io'
@@ -24,11 +30,53 @@ export function isCmsConfigured() {
   return Boolean(TOKEN && WORKSPACE && PROJECT && MODEL_IDS.spot && MODEL_IDS.mentor)
 }
 
+function geoPoint(lat, lng) {
+  return { type: 'Point', coordinates: [lng, lat] }
+}
+
+function buildFields(type, data) {
+  const hasLocation = data.lat != null && data.lng != null
+
+  if (type === 'spot') {
+    return [
+      { key: 'username',          value: data.username },
+      { key: 'area-description',  value: data['area-description'] },
+      { key: 'category',          value: data.category },
+      { key: 'recommended-for',   value: data['recommended-for'] },
+      hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
+    ]
+  }
+
+  if (type === 'mentor') {
+    return [
+      { key: 'name',             value: data.name },
+      { key: 'what-i-can-teach', value: data['what-i-can-teach'] },
+      { key: 'languages',        value: data.languages },
+      { key: 'available-when',   value: data['available-when'] },
+      hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
+    ]
+  }
+
+  if (type === 'log') {
+    return [
+      { key: 'name',                value: data.name },
+      { key: 'role',                value: data.role },
+      { key: 'spot-visited',        value: data['spot-visited'] },
+      { key: 'date',                value: data.date },
+      { key: 'what-i-learned',      value: data['what-i-learned'] },
+      { key: 'language-written-in', value: data['language-written-in'] },
+      { key: 'teacher',             value: data.teacher },
+    ]
+  }
+
+  return []
+}
+
 /**
  * Create a new item via the Re:Earth CMS Integration API.
  *
  * @param {'spot' | 'mentor' | 'log'} type
- * @param {object} data  — field values; lat/lng used for the location geo field
+ * @param {object} data — field values (lat/lng for location)
  */
 export async function createCmsItem(type, data) {
   if (!isCmsConfigured()) {
@@ -38,23 +86,9 @@ export async function createCmsItem(type, data) {
   const modelId = MODEL_IDS[type]
   if (!modelId) throw new Error(`Unknown item type: ${type}`)
 
-  // Build fields array — skip empty values
-  const fields = [
-    { key: 'name',        value: data.name },
-    { key: 'name_ja',     value: data.name_ja },
-    { key: 'description', value: data.description },
-    { key: 'category',    value: data.category },
-    { key: 'languages',   value: data.languages },
-    // Geo point — Re:Earth CMS geo field expects GeoJSON Point
-    data.lat != null && data.lng != null
-      ? { key: 'location', value: { type: 'Point', coordinates: [data.lng, data.lat] } }
-      : null,
-    // Learning log extras
-    data.spot_id   ? { key: 'spot_id',   value: data.spot_id }   : null,
-    data.notes     ? { key: 'notes',     value: data.notes }     : null,
-    data.rating    ? { key: 'rating',    value: data.rating }    : null,
-    data.visited_at ? { key: 'visited_at', value: data.visited_at } : null,
-  ].filter(Boolean).filter((f) => f.value !== '' && f.value !== undefined)
+  const fields = buildFields(type, data)
+    .filter(Boolean)
+    .filter((f) => f.value !== '' && f.value !== undefined && f.value !== null)
 
   const res = await fetch(
     `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items`,

@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 const TYPES = [
-  { id: 'spot',   ja: '学習スポット',       en: 'Learning Spot',      color: '#3b82f6' },
-  { id: 'mentor', ja: 'コミュニティメンター', en: 'Community Mentor',   color: '#f97316' },
+  { id: 'spot',   ja: '学習スポット',       en: 'Learning Spot',    color: '#3b82f6' },
+  { id: 'mentor', ja: 'コミュニティメンター', en: 'Community Mentor', color: '#f97316' },
 ]
 
 const CATEGORIES = [
@@ -15,13 +15,32 @@ const CATEGORIES = [
   { id: 'Other',    ja: 'その他',       en: 'Other'    },
 ]
 
-const LANGS = [
-  { id: 'Japanese', ja: '日本語' },
-  { id: 'English',  ja: 'English' },
-  { id: 'Other',    ja: 'その他' },
+const RECOMMEND_OPTIONS = [
+  { id: 'Children',  ja: '子ども',   en: 'Children'  },
+  { id: 'Students',  ja: '学生',     en: 'Students'  },
+  { id: 'Adults',    ja: '大人',     en: 'Adults'    },
+  { id: 'Families',  ja: '家族',     en: 'Families'  },
+  { id: 'Everyone',  ja: '全員',     en: 'Everyone'  },
 ]
 
-const EMPTY = { name: '', name_ja: '', description: '', category: '', languages: ['Japanese'] }
+const LANG_OPTIONS = [
+  { id: 'Japanese', ja: '日本語',   en: 'Japanese' },
+  { id: 'English',  ja: '英語',     en: 'English'  },
+  { id: 'Other',    ja: 'その他',   en: 'Other'    },
+]
+
+const EMPTY_SPOT = {
+  username:         '',
+  'area-description': '',
+  category:         '',
+  'recommended-for': [],
+}
+const EMPTY_MENTOR = {
+  name:              '',
+  'what-i-can-teach': '',
+  languages:         'Japanese',
+  'available-when':  '',
+}
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 function CameraIcon({ className }) {
@@ -32,7 +51,6 @@ function CameraIcon({ className }) {
     </svg>
   )
 }
-
 function GalleryIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
@@ -42,7 +60,6 @@ function GalleryIcon({ className }) {
     </svg>
   )
 }
-
 function CheckIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
@@ -93,7 +110,7 @@ export default function ReportView({ onSubmit, onViewMap }) {
   const [coords,       setCoords]       = useState(null)
   const [locStatus,    setLocStatus]    = useState('finding')
   const [type,         setType]         = useState(null)
-  const [form,         setForm]         = useState(EMPTY)
+  const [form,         setForm]         = useState(EMPTY_SPOT)
   const [submitting,   setSubmitting]   = useState(false)
   const [done,         setDone]         = useState(false)
   const [formError,    setFormError]    = useState(null)
@@ -110,6 +127,11 @@ export default function ReportView({ onSubmit, onViewMap }) {
     )
   }, [])
 
+  function selectType(t) {
+    setType(t)
+    setForm(t === 'spot' ? EMPTY_SPOT : EMPTY_MENTOR)
+  }
+
   function handlePhoto(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -118,18 +140,21 @@ export default function ReportView({ onSubmit, onViewMap }) {
   }
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
-  function toggleLang(id) {
+
+  function toggleRecommend(id) {
     setForm((f) => ({
       ...f,
-      languages: f.languages.includes(id)
-        ? f.languages.filter((l) => l !== id)
-        : [...f.languages, id],
+      'recommended-for': f['recommended-for'].includes(id)
+        ? f['recommended-for'].filter((x) => x !== id)
+        : [...f['recommended-for'], id],
     }))
   }
 
+  const nameValue = type === 'spot' ? form.username : form.name
+  const canSubmit = nameValue?.trim() && type && !submitting
+
   async function handleSubmit() {
-    if (!form.name_ja.trim() && !form.name.trim()) return
-    if (!form.category || !type) return
+    if (!canSubmit) return
     setSubmitting(true)
     setFormError(null)
     try {
@@ -143,13 +168,11 @@ export default function ReportView({ onSubmit, onViewMap }) {
   }
 
   function reset() {
-    setDone(false); setForm(EMPTY); setPhotoPreview(null)
+    setDone(false); setForm(EMPTY_SPOT); setPhotoPreview(null)
     setPhotoFile(null); setType(null); setFormError(null)
   }
 
   if (done) return <SuccessScreen onReset={reset} onViewMap={onViewMap} />
-
-  const canSubmit = (form.name_ja.trim() || form.name.trim()) && form.category && type && !submitting
 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-100 pb-24">
@@ -169,7 +192,6 @@ export default function ReportView({ onSubmit, onViewMap }) {
         <Section num="1" ja="写真" en="Photo">
           <input ref={cameraRef}  type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
           <input ref={galleryRef} type="file" accept="image/*"                       className="hidden" onChange={handlePhoto} />
-
           {photoPreview ? (
             <div className="relative rounded-xl overflow-hidden">
               <img src={photoPreview} alt="preview" className="w-full h-48 object-cover" />
@@ -180,18 +202,14 @@ export default function ReportView({ onSubmit, onViewMap }) {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => cameraRef.current?.click()}
-                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-7 active:scale-95 transition-all"
-              >
+              <button onClick={() => cameraRef.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-7 active:scale-95 transition-all">
                 <CameraIcon className="w-8 h-8 text-teal-500" />
                 <span className="text-sm font-bold text-teal-700">写真を撮る</span>
                 <span className="text-xs text-teal-500">Take Photo</span>
               </button>
-              <button
-                onClick={() => galleryRef.current?.click()}
-                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl py-7 active:scale-95 transition-all"
-              >
+              <button onClick={() => galleryRef.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl py-7 active:scale-95 transition-all">
                 <GalleryIcon className="w-8 h-8 text-gray-400" />
                 <span className="text-sm font-bold text-gray-500">ライブラリ</span>
                 <span className="text-xs text-gray-400">From Library</span>
@@ -206,17 +224,11 @@ export default function ReportView({ onSubmit, onViewMap }) {
             {TYPES.map((t) => {
               const active = type === t.id
               return (
-                <button
-                  key={t.id}
-                  onClick={() => setType(t.id)}
+                <button key={t.id} onClick={() => selectType(t.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all active:scale-[0.98] ${
                     active ? 'border-gray-300 bg-gray-50' : 'border-gray-100 bg-white hover:border-gray-200'
-                  }`}
-                >
-                  <div
-                    className="w-3.5 h-3.5 rounded-full shrink-0"
-                    style={{ background: active ? t.color : '#d1d5db' }}
-                  />
+                  }`}>
+                  <div className="w-3.5 h-3.5 rounded-full shrink-0" style={{ background: active ? t.color : '#d1d5db' }} />
                   <div className="text-left">
                     <p className="text-sm font-bold text-gray-900">{t.ja}</p>
                     <p className="text-xs text-gray-400">{t.en}</p>
@@ -232,80 +244,111 @@ export default function ReportView({ onSubmit, onViewMap }) {
           </div>
         </Section>
 
-        {/* ── 3. カテゴリ ──────────────────────────── */}
-        <Section num="3" ja="カテゴリ" en="Category">
-          <div className="space-y-2">
-            {CATEGORIES.map((cat) => {
-              const active = form.category === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => set('category', cat.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.98] ${
-                    active ? 'border-teal-300 bg-teal-50' : 'border-gray-100 bg-white hover:border-gray-200'
-                  }`}
-                >
-                  <div className={`w-3 h-3 rounded-full shrink-0 ${active ? 'bg-teal-600' : 'bg-gray-300'}`} />
-                  <span className={`text-sm font-bold ${active ? 'text-teal-800' : 'text-gray-700'}`}>{cat.ja}</span>
-                  <span className={`text-xs ml-1 ${active ? 'text-teal-500' : 'text-gray-400'}`}>{cat.en}</span>
-                  {active && <CheckIcon className="w-4 h-4 text-teal-600 ml-auto" />}
-                </button>
-              )
-            })}
-          </div>
-        </Section>
+        {/* ── 3. カテゴリ (spots only) ─────────────── */}
+        {type === 'spot' && (
+          <Section num="3" ja="カテゴリ" en="Category">
+            <div className="space-y-2">
+              {CATEGORIES.map((cat) => {
+                const active = form.category === cat.id
+                return (
+                  <button key={cat.id} onClick={() => set('category', cat.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.98] ${
+                      active ? 'border-teal-300 bg-teal-50' : 'border-gray-100 bg-white hover:border-gray-200'
+                    }`}>
+                    <div className={`w-3 h-3 rounded-full shrink-0 ${active ? 'bg-teal-600' : 'bg-gray-300'}`} />
+                    <span className={`text-sm font-bold ${active ? 'text-teal-800' : 'text-gray-700'}`}>{cat.ja}</span>
+                    <span className={`text-xs ml-1 ${active ? 'text-teal-500' : 'text-gray-400'}`}>{cat.en}</span>
+                    {active && <CheckIcon className="w-4 h-4 text-teal-600 ml-auto" />}
+                  </button>
+                )
+              })}
+            </div>
+          </Section>
+        )}
 
-        {/* ── 4. 名前 ─────────────────────────────── */}
-        <Section num="4" ja="名前" en="Name">
-          <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5">日本語 <span className="text-red-400 font-normal">必須</span></label>
-              <input
-                type="text" value={form.name_ja}
-                onChange={(e) => set('name_ja', e.target.value)}
-                className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                placeholder="例：北広島町立図書館"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5">English</label>
-              <input
-                type="text" value={form.name}
-                onChange={(e) => set('name', e.target.value)}
-                className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                placeholder="e.g. Kitahiroshima Town Library"
-              />
-            </div>
-          </div>
-        </Section>
+        {/* ── 4. 名前 / ユーザー名 ────────────────── */}
+        {type && (
+          <Section
+            num={type === 'spot' ? '4' : '3'}
+            ja={type === 'spot' ? 'ユーザー名' : '名前'}
+            en={type === 'spot' ? 'Username' : 'Name'}
+          >
+            <input
+              type="text"
+              value={type === 'spot' ? form.username : form.name}
+              onChange={(e) => set(type === 'spot' ? 'username' : 'name', e.target.value)}
+              className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+              placeholder={type === 'spot' ? '例：yamada_taro' : '例：山田 花子'}
+            />
+          </Section>
+        )}
 
         {/* ── 5. 説明 ─────────────────────────────── */}
-        <Section num="5" ja="説明" en="Description">
-          <textarea
-            value={form.description}
-            onChange={(e) => set('description', e.target.value)}
-            rows={3}
-            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none"
-            placeholder="このスポットやメンターについて教えてください…"
-          />
-          <p className="text-xs text-gray-400 mt-1">Tell us about this spot or mentor…</p>
-        </Section>
+        {type && (
+          <Section
+            num={type === 'spot' ? '5' : '4'}
+            ja={type === 'spot' ? 'エリアの説明' : '教えられること'}
+            en={type === 'spot' ? 'Area Description' : 'What I Can Teach'}
+          >
+            <textarea
+              value={type === 'spot' ? form['area-description'] : form['what-i-can-teach']}
+              onChange={(e) => set(type === 'spot' ? 'area-description' : 'what-i-can-teach', e.target.value)}
+              rows={3}
+              className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none"
+              placeholder={type === 'spot' ? 'このスポットについて教えてください…' : 'どんなことを教えられますか…'}
+            />
+          </Section>
+        )}
 
-        {/* ── 6. 言語 ─────────────────────────────── */}
-        <Section num="6" ja="対応言語" en="Languages">
-          <div className="space-y-2">
-            {LANGS.map((l) => (
-              <label key={l.id} className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-gray-100 bg-white cursor-pointer select-none active:scale-[0.98] transition-all">
-                <input
-                  type="checkbox" checked={form.languages.includes(l.id)}
-                  onChange={() => toggleLang(l.id)}
-                  className="w-4 h-4 accent-teal-600 rounded"
-                />
-                <span className="text-sm font-bold text-gray-800">{l.ja}</span>
-              </label>
-            ))}
-          </div>
-        </Section>
+        {/* ── 6a. おすすめ対象 (spots) ─────────────── */}
+        {type === 'spot' && (
+          <Section num="6" ja="おすすめ対象" en="Recommended For">
+            <div className="space-y-2">
+              {RECOMMEND_OPTIONS.map((opt) => (
+                <label key={opt.id} className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-gray-100 bg-white cursor-pointer select-none active:scale-[0.98] transition-all">
+                  <input
+                    type="checkbox"
+                    checked={form['recommended-for'].includes(opt.id)}
+                    onChange={() => toggleRecommend(opt.id)}
+                    className="w-4 h-4 accent-teal-600 rounded"
+                  />
+                  <span className="text-sm font-bold text-gray-800">{opt.ja}</span>
+                  <span className="text-xs text-gray-400 ml-1">{opt.en}</span>
+                </label>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {/* ── 6b. 言語 + 活動時間 (mentors) ───────── */}
+        {type === 'mentor' && (
+          <>
+            <Section num="5" ja="対応言語" en="Languages">
+              <div className="space-y-2">
+                {LANG_OPTIONS.map((l) => (
+                  <button key={l.id} onClick={() => set('languages', l.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.98] ${
+                      form.languages === l.id ? 'border-teal-300 bg-teal-50' : 'border-gray-100 bg-white hover:border-gray-200'
+                    }`}>
+                    <div className={`w-3 h-3 rounded-full shrink-0 ${form.languages === l.id ? 'bg-teal-600' : 'bg-gray-300'}`} />
+                    <span className={`text-sm font-bold ${form.languages === l.id ? 'text-teal-800' : 'text-gray-700'}`}>{l.ja}</span>
+                    <span className={`text-xs ml-1 ${form.languages === l.id ? 'text-teal-500' : 'text-gray-400'}`}>{l.en}</span>
+                    {form.languages === l.id && <CheckIcon className="w-4 h-4 text-teal-600 ml-auto" />}
+                  </button>
+                ))}
+              </div>
+            </Section>
+            <Section num="6" ja="活動できる時間" en="Available When">
+              <input
+                type="text"
+                value={form['available-when']}
+                onChange={(e) => set('available-when', e.target.value)}
+                className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+                placeholder="例：週末・午後 / Weekends, afternoons"
+              />
+            </Section>
+          </>
+        )}
 
         {/* ── GPS ─────────────────────────────────── */}
         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
@@ -323,18 +366,19 @@ export default function ReportView({ onSubmit, onViewMap }) {
               {locStatus === 'finding' ? '位置情報を取得中…' : locStatus === 'found' ? 'GPS取得済み' : '位置情報が利用できません'}
             </p>
             <p className="text-xs text-gray-400">
-              {locStatus === 'found' && coords ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}` :
-               locStatus === 'error' ? 'デフォルト位置（北広島町）を使用します' : 'Detecting location…'}
+              {locStatus === 'found' && coords
+                ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`
+                : locStatus === 'error'
+                ? 'デフォルト位置（北広島町）を使用します'
+                : 'Detecting location…'}
             </p>
           </div>
         </div>
 
-        {/* Error */}
         {formError && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{formError}</div>
         )}
 
-        {/* Submit */}
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
