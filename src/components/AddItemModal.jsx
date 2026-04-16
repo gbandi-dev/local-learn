@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const CATEGORIES = ['Nature', 'Workshop', 'Culture', 'Sports', 'Library', 'Other']
 const CATEGORY_JA = { Nature: '自然', Workshop: 'ワーク', Culture: '文化', Sports: '運動', Library: '図書', Other: 'その他' }
@@ -17,15 +17,27 @@ const EMPTY_MENTOR = {
   'available-when':   '',
 }
 
+function CameraIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+  )
+}
+
 export default function AddItemModal({ type, coords: initialCoords, onClose, onSuccess, onSubmit }) {
   const isSpot = type === 'spot'
-  const [form,       setForm]       = useState(isSpot ? EMPTY_SPOT : EMPTY_MENTOR)
-  const [coords,     setCoords]     = useState(initialCoords)
-  const [geoLoading, setGeoLoading] = useState(false)
-  const [geoError,   setGeoError]   = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [error,      setError]      = useState(null)
-  const [done,       setDone]       = useState(false)
+  const [form,         setForm]         = useState(isSpot ? EMPTY_SPOT : EMPTY_MENTOR)
+  const [coords,       setCoords]       = useState(initialCoords)
+  const [geoLoading,   setGeoLoading]   = useState(false)
+  const [geoError,     setGeoError]     = useState(null)
+  const [submitting,   setSubmitting]   = useState(false)
+  const [error,        setError]        = useState(null)
+  const [done,         setDone]         = useState(false)
+  const [photoFile,    setPhotoFile]    = useState(null)
+  const [photoPreview, setPhotoPreview] = useState(null)
+  const cameraRef = useRef()
 
   // Lock body scroll while modal is open (prevents iOS background scroll bleed)
   useEffect(() => {
@@ -55,6 +67,13 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
     )
   }
 
+  function handlePhoto(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     const name = isSpot ? form.username : form.name
@@ -62,7 +81,7 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
     setSubmitting(true)
     setError(null)
     try {
-      await onSubmit(type, form, coords)
+      await onSubmit(type, { ...form, photoFile }, coords)
       setDone(true)
       setTimeout(() => { onSuccess(); onClose() }, 1200)
     } catch (err) {
@@ -199,6 +218,26 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
               />
             </div>
           )}
+
+          {/* Photo */}
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">写真 / Photo <span className="text-gray-400 normal-case font-normal">(任意 / optional)</span></p>
+            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
+            {photoPreview ? (
+              <div className="relative rounded-xl overflow-hidden">
+                <img src={photoPreview} alt="preview" className="w-full h-40 object-cover" />
+                <button type="button" onClick={() => { setPhotoPreview(null); setPhotoFile(null) }}
+                  className="absolute top-2 right-2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">×</button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => cameraRef.current?.click()}
+                className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-6 active:scale-95 transition-all">
+                <CameraIcon className="w-7 h-7 text-teal-500" />
+                <span className="text-sm font-bold text-teal-700">写真を追加</span>
+                <span className="text-xs text-teal-500">Add a Photo</span>
+              </button>
+            )}
+          </div>
 
           {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{error}</div>}
           {done  && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-700 font-medium">保存しました！/ Saved! Refreshing map…</div>}

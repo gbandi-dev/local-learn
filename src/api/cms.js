@@ -35,6 +35,26 @@ function geoPoint(lat, lng) {
   return { type: 'Point', coordinates: [lng, lat] }
 }
 
+/**
+ * Upload a file as a CMS asset and return its ID.
+ * Returns null if upload fails (non-fatal).
+ */
+async function uploadAsset(file) {
+  try {
+    const body = new FormData()
+    body.append('file', file)
+    const res = await fetch(
+      `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/assets`,
+      { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body }
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.id ?? null
+  } catch {
+    return null
+  }
+}
+
 function buildFields(type, data) {
   const hasLocation = data.lat != null && data.lng != null
 
@@ -44,6 +64,7 @@ function buildFields(type, data) {
       { key: 'area-description',  value: data['area-description'] },
       { key: 'category',          value: data.category },
       { key: 'recommended-for',   value: data['recommended-for'] },
+      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
       hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
@@ -54,6 +75,7 @@ function buildFields(type, data) {
       { key: 'what-i-can-teach', value: data['what-i-can-teach'] },
       { key: 'languages',        value: data.languages },
       { key: 'available-when',   value: data['available-when'] },
+      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
       hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
@@ -87,7 +109,14 @@ export async function createCmsItem(type, data) {
   const modelId = MODEL_IDS[type]
   if (!modelId) throw new Error(`Unknown item type: ${type}`)
 
-  const fields = buildFields(type, data)
+  // Upload photo file if present, attach asset ID to data
+  let enrichedData = data
+  if (data.photoFile instanceof File) {
+    const photoAssetId = await uploadAsset(data.photoFile)
+    enrichedData = { ...data, photoAssetId }
+  }
+
+  const fields = buildFields(type, enrichedData)
     .filter(Boolean)
     .filter((f) => f.value !== '' && f.value !== undefined && f.value !== null)
 
