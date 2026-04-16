@@ -222,7 +222,7 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
           {/* Photo */}
           <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">写真 / Photo <span className="text-gray-400 normal-case font-normal">(任意 / optional)</span></p>
-            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
+            <input ref={cameraRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
             {photoPreview ? (
               <div className="relative rounded-xl overflow-hidden">
                 <img src={photoPreview} alt="preview" className="w-full h-40 object-cover" />

@@ -228,7 +228,7 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
 
         {/* 6. 写真 */}
         <Section num="6" ja="写真" en="Photo">
-          <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
+          <input ref={cameraRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
           {photoPreview ? (
             <div className="relative rounded-xl overflow-hidden">
               <img src={photoPreview} alt="preview" className="w-full h-48 object-cover" />
