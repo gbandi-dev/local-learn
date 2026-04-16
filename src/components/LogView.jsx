@@ -69,14 +69,29 @@ function SuccessScreen({ onReset }) {
   )
 }
 
-export default function LogView({ onSubmit }) {
+export default function LogView({ onSubmit, coords: initialCoords }) {
   const [form,       setForm]       = useState(EMPTY)
+  const [coords,     setCoords]     = useState(initialCoords ?? null)
+  const [geoLoading, setGeoLoading] = useState(false)
   const [photoFile,  setPhotoFile]  = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [done,       setDone]       = useState(false)
   const [formError,  setFormError]  = useState(null)
   const cameraRef = useRef()
+
+  function handleGeolocate() {
+    if (!navigator.geolocation) return
+    setGeoLoading(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setGeoLoading(false)
+      },
+      () => setGeoLoading(false),
+      { timeout: 10000 }
+    )
+  }
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
   function toggleLang(id) {
@@ -100,7 +115,7 @@ export default function LogView({ onSubmit }) {
     setSubmitting(true)
     setFormError(null)
     try {
-      await onSubmit('log', { ...form, photoFile }, null)
+      await onSubmit('log', { ...form, photoFile }, coords)
       setDone(true)
     } catch (err) {
       setFormError(err.message)
@@ -132,6 +147,30 @@ export default function LogView({ onSubmit }) {
       </div>
 
       <div className="px-4 py-4 space-y-3">
+
+        {/* Location */}
+        <Section num="📍" ja="場所" en="Location">
+          {coords ? (
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
+              <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+              <span className="flex-1 text-sm font-mono text-green-800">{coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}</span>
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400 mb-2">位置情報なし / No location set</p>
+          )}
+          <button
+            type="button"
+            onClick={handleGeolocate}
+            disabled={geoLoading}
+            className="mt-2 w-full flex items-center justify-center gap-2 py-2 rounded-xl border-2 border-teal-200 bg-teal-50 text-teal-700 text-xs font-semibold active:scale-95 transition-all disabled:opacity-50"
+          >
+            {geoLoading
+              ? <span className="w-3.5 h-3.5 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+              : <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            }
+            現在地を使う / Use My Location
+          </button>
+        </Section>
 
         {/* 1. 名前 */}
         <Section num="1" ja="あなたの名前" en="Your Name">

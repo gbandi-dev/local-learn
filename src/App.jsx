@@ -78,7 +78,7 @@ const NAV = [
 
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
-  const { spots, mentors, loading, error, refresh } = useGeoData()
+  const { spots, mentors, logs, loading, error, refresh } = useGeoData()
 
   const [localSpots,   setLocalSpots]   = useState([])
   const [localMentors, setLocalMentors] = useState([])
@@ -93,6 +93,7 @@ export default function App() {
   const [addingType,      setAddingType]      = useState(null)
   const [pickingLocation, setPickingLocation] = useState(false)
   const [draftCoords,     setDraftCoords]     = useState(null)
+  const [logCoords,       setLogCoords]       = useState(null)
   const [adminOpen,        setAdminOpen]       = useState(false)
   const [showAdminPrompt,  setShowAdminPrompt] = useState(false)
   const [adminPromptPw,    setAdminPromptPw]   = useState('')
@@ -144,9 +145,10 @@ export default function App() {
     setAddingType(type)
     setPickingLocation(true)
     setMobileView('map')
+    if (type === 'log') setLogCoords(null)
   }
   function cancelAdding() {
-    setAddingType(null); setPickingLocation(false); setDraftCoords(null)
+    setAddingType(null); setPickingLocation(false); setDraftCoords(null); setLogCoords(null)
   }
   function goTab(id) {
     if (id === 'report') {
@@ -175,11 +177,23 @@ export default function App() {
     }
   }
 
+  function handleMapClick(coords) {
+    if (!pickingLocation) return
+    setPickingLocation(false)
+    if (addingType === 'log') {
+      setLogCoords(coords)
+      setAddingType(null)
+      setMobileView('report-log')
+    } else {
+      setDraftCoords(coords)
+    }
+  }
+
   const mapEl = (
     <MapView
-      spots={allSpots} mentors={allMentors} selected={selected}
+      spots={allSpots} mentors={allMentors} logs={logs} selected={selected}
       onSelect={(item) => { setSelected(item); setMobileView('list') }}
-      onMapClick={(coords) => { if (!pickingLocation) return; setDraftCoords(coords); setPickingLocation(false) }}
+      onMapClick={handleMapClick}
       pickingLocation={pickingLocation}
       category={category}
     />
@@ -277,6 +291,14 @@ export default function App() {
                   <p className="text-xs opacity-70">Add a Person</p>
                 </div>
               </button>
+              <button onClick={() => startAdding('log')}
+                className="w-full flex items-center gap-2 justify-center py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-sm font-semibold transition-all">
+                <IconPlus className="w-4 h-4" />
+                <div className="text-left">
+                  <p className="text-xs font-bold leading-none">学びを記録する</p>
+                  <p className="text-xs opacity-70">Add a Learning Record</p>
+                </div>
+              </button>
             </>
           )}
         </div>
@@ -344,20 +366,30 @@ export default function App() {
                       <p className="opacity-70 font-normal">Add a Person</p>
                     </div>
                   </button>
+                  <button
+                    onClick={() => startAdding('log')}
+                    className="flex items-center gap-2 px-3 py-2 bg-emerald-600 active:bg-emerald-700 text-white text-xs font-bold rounded-full shadow-lg"
+                  >
+                    <IconPlus className="w-3.5 h-3.5 shrink-0" />
+                    <div className="text-left leading-tight">
+                      <p>学びを記録する</p>
+                      <p className="opacity-70 font-normal">Add a Learning Record</p>
+                    </div>
+                  </button>
                 </div>
               )}
             </div>
           )}
           {(mobileView === 'list' || mobileView === 'places') && <div className="flex flex-1 overflow-hidden w-full">{mobileSidebarEl}</div>}
           {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
-          {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
+          {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} coords={logCoords} />}
         </div>
       </div>
 
       {/* ── Desktop main area ──────────────────── */}
       <div className="hidden md:flex flex-1 overflow-hidden">
         {mobileView === 'report'     && <ReportView onSubmit={handleSubmit} onViewMap={() => goTab('map')} />}
-        {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} />}
+        {mobileView === 'report-log' && <LogView onSubmit={handleSubmit} coords={logCoords} />}
         {(mobileView === 'map' || mobileView === 'list' || mobileView === 'places') && (
           <>{sidebarEl}<div className="flex-1 h-full">{mapEl}</div></>
         )}

@@ -32,8 +32,8 @@ const MAP_STYLE = {
 
 const INITIAL_VIEW = { longitude: 132.53736, latitude: 34.67402, zoom: 15 }
 
-const TYPE_COLOR = { spot: '#3b82f6', mentor: '#f97316' }
-const TYPE_LABEL = { spot: '場', mentor: '人' }
+const TYPE_COLOR = { spot: '#3b82f6', mentor: '#f97316', log: '#10b981' }
+const TYPE_LABEL = { spot: '場', mentor: '人', log: '学' }
 
 function Pin({ type, selected, demo }) {
   const color = TYPE_COLOR[type] ?? '#6b7280'
@@ -122,7 +122,7 @@ function LocationButton({ mapRef, pickingLocation, onMapClick }) {
 }
 
 export default function MapView({
-  spots, mentors, selected, onSelect,
+  spots, mentors, logs, selected, onSelect,
   onMapClick, pickingLocation, category,
 }) {
   const mapRef = useRef()
@@ -190,6 +190,21 @@ export default function MapView({
             </Marker>
           )
         })}
+
+        {(logs ?? []).map((feature, i) => {
+          const [lng, lat] = feature.geometry.coordinates
+          return (
+            <Marker
+              key={feature.id ?? `log-${i}`}
+              longitude={lng}
+              latitude={lat}
+              anchor="center"
+              onClick={(e) => { e.originalEvent.stopPropagation(); onSelect(feature) }}
+            >
+              <Pin type="log" selected={selected?.id === feature.id} demo={false} />
+            </Marker>
+          )
+        })}
       </Map>
 
       {/* Empty state overlay */}
@@ -229,6 +244,13 @@ export default function MapView({
           <div>
             <p className="font-bold leading-none">まちの人</p>
             <p className="text-gray-400 text-xs">Person in Town</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">学</div>
+          <div>
+            <p className="font-bold leading-none">学びの記録</p>
+            <p className="text-gray-400 text-xs">Learning Record</p>
           </div>
         </div>
       </div>
