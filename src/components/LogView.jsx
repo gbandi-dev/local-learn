@@ -58,7 +58,9 @@ export default function LogView({ onSubmit }) {
   function handlePhoto(e) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+    const name = file.name.toLowerCase()
+    const isJpeg = file.type === 'image/jpeg' || name.endsWith('.jpg') || name.endsWith('.jpeg')
+    if (!isJpeg) {
       setFormError('写真はJPG形式のみ対応しています / Only JPG photos are supported')
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
@@ -195,7 +197,7 @@ export default function LogView({ onSubmit }) {
             ref={fileInputRef}
             id="log-photo"
             type="file"
-            accept="image/jpeg"
+            accept=".jpg,.jpeg,image/jpeg"
             className="hidden"
             onChange={handlePhoto}
           />

@@ -99,6 +99,7 @@ function buildFields(type, data) {
       { key: 'teacher',             value: data.teacher },
       { key: 'language-written-in', value: [data['language-written-in'] || 'Japanese'] },
       data.photoAssetId ? { key: 'photo', value: [data.photoAssetId] } : null,
+      hasLocation ? { key: 'location-point', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
 
