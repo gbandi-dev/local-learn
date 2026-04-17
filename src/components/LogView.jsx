@@ -44,7 +44,7 @@ const CATEGORIES = [
   { value: 'Nature',    ja: '自然',           en: 'Nature'    },
   { value: 'Workshop',  ja: 'ワークショップ', en: 'Workshop'  },
   { value: 'Culture',   ja: '文化',           en: 'Culture'   },
-  { value: 'Sports',    ja: '運動',           en: 'Sports'    },
+  { value: 'Sports',    ja: 'スポーツ',        en: 'Sports'    },
   { value: 'Library',   ja: '図書',           en: 'Library'   },
   { value: 'Other',     ja: 'その他',         en: 'Other'     },
 ]
