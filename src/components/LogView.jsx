@@ -40,9 +40,18 @@ const ROLES = [
   { value: 'Other',            label: 'その他 / Other' },
 ]
 
+const CATEGORIES = [
+  { value: 'Nature',    ja: '自然',           en: 'Nature'    },
+  { value: 'Workshop',  ja: 'ワークショップ', en: 'Workshop'  },
+  { value: 'Culture',   ja: '文化',           en: 'Culture'   },
+  { value: 'Sports',    ja: '運動',           en: 'Sports'    },
+  { value: 'Library',   ja: '図書',           en: 'Library'   },
+  { value: 'Other',     ja: 'その他',         en: 'Other'     },
+]
+
 const today = () => new Date().toISOString().split('T')[0]
 
-const EMPTY = { name: '', role: '', 'spot-visited': '', date: today(), 'what-i-learned': '', teacher: '' }
+const EMPTY = { name: '', role: '', category: '', 'spot-visited': '', date: today(), 'what-i-learned': '', teacher: '' }
 
 export default function LogView({ onSubmit, coords }) {
   const [form,         setForm]         = useState(EMPTY)
@@ -144,6 +153,29 @@ export default function LogView({ onSubmit, coords }) {
                 {r.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Category */}
+        <div>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+            カテゴリ / Category
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {CATEGORIES.map((cat) => {
+              const active = form.category === cat.value
+              return (
+                <button key={cat.value} type="button" onClick={() => set('category', active ? '' : cat.value)}
+                  className={`py-2.5 rounded-xl border-2 text-xs font-semibold transition-all active:scale-95 ${
+                    active
+                      ? 'bg-teal-700 border-teal-700 text-white'
+                      : 'border-gray-200 bg-white text-gray-600 active:bg-gray-50'
+                  }`}>
+                  <span className="block">{cat.ja}</span>
+                  <span className={`block text-xs ${active ? 'text-teal-200' : 'text-gray-400'}`}>{cat.en}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
