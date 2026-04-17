@@ -121,7 +121,7 @@ export default function App() {
     if (tab === 'spots'   && item._type !== 'spot')   return false
     if (tab === 'mentors' && item._type !== 'mentor') return false
     if (tab === 'logs'    && item._type !== 'log')    return false
-    if (category !== 'all' && item._type !== 'log') {
+    if (category !== 'all') {
       if ((item.properties?.category ?? '').toLowerCase() !== category.toLowerCase()) return false
     }
     return true

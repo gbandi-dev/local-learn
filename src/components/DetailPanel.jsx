@@ -82,6 +82,14 @@ export default function DetailPanel({ item, onBack }) {
           {/* ── Log fields ── */}
           {isLog && (
             <>
+              {p.category && (
+                <div className="bg-white rounded-xl border border-gray-200 p-3">
+                  <p className="text-xs text-gray-400 font-semibold mb-1">カテゴリ / Category</p>
+                  <p className="text-sm text-gray-800 font-medium">
+                    {CATEGORY_JA[p.category] ? `${CATEGORY_JA[p.category]} / ${p.category}` : p.category}
+                  </p>
+                </div>
+              )}
               {p.role && (
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
                   <p className="text-xs text-gray-400 font-semibold mb-1">役割 / Role</p>
