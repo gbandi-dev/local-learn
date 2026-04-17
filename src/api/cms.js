@@ -44,16 +44,22 @@ async function uploadAsset(file) {
     const body = new FormData()
     body.append('file', file)
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 8000)
+    const timer = setTimeout(() => controller.abort(), 30000)
     const res = await fetch(
       `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/assets`,
       { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` }, body, signal: controller.signal }
     )
     clearTimeout(timer)
-    if (!res.ok) return null
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '')
+      console.error('[CMS asset] upload failed:', res.status, errText)
+      return null
+    }
     const data = await res.json()
+    console.log('[CMS asset] upload response:', data)
     return { id: data.id ?? null, url: data.url ?? null }
-  } catch {
+  } catch (e) {
+    console.error('[CMS asset] upload exception:', e)
     return null
   }
 }
@@ -90,7 +96,7 @@ function buildFields(type, data) {
       { key: 'spot-visited',        value: data['spot-visited'] },
       { key: 'date',                value: data.date || null },
       { key: 'what-i-learned',      value: data['what-i-learned'] },
-      { key: 'language-written-in', value: data['language-written-in'] },
+      { key: 'language-written-in', value: Array.isArray(data['language-written-in']) ? data['language-written-in'].join(',') : (data['language-written-in'] || null) },
       { key: 'teacher',             value: data.teacher },
       data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
       hasLocation ? { key: 'location-point', value: geoPoint(data.lat, data.lng) } : null,
@@ -118,12 +124,12 @@ export async function createCmsItem(type, data) {
   let enrichedData = data
   if (data.photoFile instanceof File) {
     const asset = await uploadAsset(data.photoFile)
+    console.log('[CMS] asset upload result for', type, ':', asset)
     if (type === 'log') {
-      // Log photo field is Text type — store URL string
       enrichedData = { ...data, photoAssetId: asset?.url ?? null }
     } else {
-      // Spot/mentor photo fields are Asset type — store array of IDs
-      enrichedData = { ...data, photoAssetId: asset?.id ? [asset.id] : null }
+      // Asset field — send single ID string
+      enrichedData = { ...data, photoAssetId: asset?.id ?? null }
     }
   }
 
