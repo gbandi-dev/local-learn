@@ -120,8 +120,6 @@ If it ends up helping even a small number of kids or interns navigate learning a
 
 I’m planning to spend this weekend mapping the town with local people. We already spend time together most weekends, so it feels natural to start building this into that rhythm.
 
-Big thanks to **@Maher** and **@Yamazaki** for the support 🙏
-
 ---
 
 ## For developers
