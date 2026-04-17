@@ -10,9 +10,10 @@ const ROLES = [
 ]
 
 const LANGS = [
-  { id: 'Japanese', ja: '日本語',  en: 'Japanese' },
-  { id: 'English',  ja: '英語',    en: 'English'  },
-  { id: 'Other',    ja: 'その他',  en: 'Other'    },
+  { id: 'Japanese',   ja: '日本語',    en: 'Japanese'   },
+  { id: 'English',    ja: '英語',      en: 'English'    },
+  { id: 'Vietnamese', ja: 'ベトナム語', en: 'Vietnamese' },
+  { id: 'Other',      ja: 'その他',    en: 'Other'      },
 ]
 
 const EMPTY = {
@@ -21,7 +22,7 @@ const EMPTY = {
   'spot-visited':      '',
   date:                new Date().toISOString().split('T')[0],
   'what-i-learned':    '',
-  'language-written-in': [],
+  'language-written-in': '',
   teacher:             '',
 }
 
@@ -94,14 +95,7 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
   }
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
-  function toggleLang(id) {
-    setForm((f) => ({
-      ...f,
-      'language-written-in': f['language-written-in'].includes(id)
-        ? f['language-written-in'].filter((l) => l !== id)
-        : [...f['language-written-in'], id],
-    }))
-  }
+  function setLang(id) { set('language-written-in', id) }
 
   function handlePhoto(e) {
     const file = e.target.files?.[0]
@@ -248,17 +242,22 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
         {/* 7. 言語 */}
         <Section num="7" ja="記録の言語" en="Language Written In">
           <div className="space-y-2">
-            {LANGS.map((l) => (
-              <label key={l.id} className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-gray-100 bg-white cursor-pointer select-none">
-                <input type="checkbox" checked={form['language-written-in'].includes(l.id)}
-                  onChange={() => toggleLang(l.id)}
-                  className="w-4 h-4 accent-teal-600 rounded" />
-                <div>
-                  <p className="text-sm font-bold text-gray-800">{l.ja}</p>
-                  <p className="text-xs text-gray-400">{l.en}</p>
-                </div>
-              </label>
-            ))}
+            {LANGS.map((l) => {
+              const active = form['language-written-in'] === l.id
+              return (
+                <button key={l.id} onClick={() => setLang(l.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.98] ${
+                    active ? 'border-teal-300 bg-teal-50' : 'border-gray-100 bg-white hover:border-gray-200'
+                  }`}>
+                  <div className={`w-3 h-3 rounded-full shrink-0 ${active ? 'bg-teal-600' : 'bg-gray-300'}`} />
+                  <div className="text-left">
+                    <p className={`text-sm font-bold ${active ? 'text-teal-800' : 'text-gray-700'}`}>{l.ja}</p>
+                    <p className={`text-xs ${active ? 'text-teal-500' : 'text-gray-400'}`}>{l.en}</p>
+                  </div>
+                  {active && <CheckIcon className="w-4 h-4 text-teal-600 ml-auto" />}
+                </button>
+              )
+            })}
           </div>
         </Section>
 
