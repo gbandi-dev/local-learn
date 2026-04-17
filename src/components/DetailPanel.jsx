@@ -17,6 +17,12 @@ const CATEGORY_JA = {
   Other:    'その他',
 }
 
+const LANG_JA = {
+  Japanese: '日本語',
+  English:  '英語',
+  Other:    'その他',
+}
+
 
 
 export default function DetailPanel({ item, onBack }) {
@@ -155,7 +161,9 @@ export default function DetailPanel({ item, onBack }) {
                   <p className="text-xs text-gray-400 font-semibold mb-2">言語 / Languages</p>
                   <div className="flex flex-wrap gap-1.5">
                     {langs.map((lang) => (
-                      <span key={lang} className="text-xs bg-gray-100 text-gray-700 font-medium px-2.5 py-1 rounded-full">{lang}</span>
+                      <span key={lang} className="text-xs bg-gray-100 text-gray-700 font-medium px-2.5 py-1 rounded-full">
+                        {LANG_JA[lang] ? `${LANG_JA[lang]} / ${lang}` : lang}
+                      </span>
                     ))}
                   </div>
                 </div>
