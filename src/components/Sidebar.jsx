@@ -2,9 +2,10 @@ import FilterBar from './FilterBar'
 import DetailPanel from './DetailPanel'
 
 const TABS = [
-  { id: 'all',     ja: 'すべて',     en: 'All'    },
-  { id: 'spots',   ja: 'まちの場所', en: 'Places' },
-  { id: 'mentors', ja: 'まちの人',   en: 'People' },
+  { id: 'all',     ja: 'すべて',     en: 'All'     },
+  { id: 'spots',   ja: 'まちの場所', en: 'Places'  },
+  { id: 'mentors', ja: 'まちの人',   en: 'People'  },
+  { id: 'logs',    ja: '学びの記録', en: 'Records' },
 ]
 
 const CATEGORY_JA = {
@@ -17,7 +18,7 @@ const CATEGORY_JA = {
 }
 
 export default function Sidebar({
-  spots, mentors, items, loading, error,
+  spots, mentors, logs, items, loading, error,
   selected, onSelect, category, onCategory,
   tab, onTab, isOpen, onBack, onHome,
   onAddSpot, onAddMentor,
@@ -45,16 +46,21 @@ export default function Sidebar({
       ) : (
         <>
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-2 p-3 bg-white border-b border-gray-200">
+          <div className="grid grid-cols-3 gap-2 p-3 bg-white border-b border-gray-200">
             <div className="bg-blue-50 rounded-xl p-3">
               <p className="text-2xl font-bold text-blue-700 leading-none">{spots.length}</p>
-              <p className="text-sm font-bold text-blue-700 mt-1">まちの場所</p>
-              <p className="text-xs text-blue-400">Places in Town</p>
+              <p className="text-xs font-bold text-blue-700 mt-1">まちの場所</p>
+              <p className="text-xs text-blue-400">Places</p>
             </div>
             <div className="bg-orange-50 rounded-xl p-3">
               <p className="text-2xl font-bold text-orange-600 leading-none">{mentors.length}</p>
-              <p className="text-sm font-bold text-orange-600 mt-1">まちの人</p>
-              <p className="text-xs text-orange-400">People in Town</p>
+              <p className="text-xs font-bold text-orange-600 mt-1">まちの人</p>
+              <p className="text-xs text-orange-400">People</p>
+            </div>
+            <div className="bg-emerald-50 rounded-xl p-3">
+              <p className="text-2xl font-bold text-emerald-700 leading-none">{(logs ?? []).length}</p>
+              <p className="text-xs font-bold text-emerald-700 mt-1">学びの記録</p>
+              <p className="text-xs text-emerald-400">Records</p>
             </div>
           </div>
 
@@ -119,11 +125,12 @@ export default function Sidebar({
 
 function ItemCard({ item, onSelect }) {
   const p      = item.properties ?? {}
-  const isSpot = item._type === 'spot'
-  const color  = isSpot ? 'bg-blue-500' : 'bg-orange-500'
-  const kanji  = isSpot ? '場' : '人'
+  const type   = item._type ?? 'spot'
+  const color  = type === 'spot' ? 'bg-blue-500' : type === 'log' ? 'bg-emerald-500' : 'bg-orange-500'
+  const kanji  = type === 'spot' ? '場' : type === 'log' ? '学' : '人'
 
-  const displayName = p.name ?? p.username ?? (isSpot ? 'まちの場所' : 'まちの人')
+  const rawName = p.name ?? p.username
+  const displayName = Array.isArray(rawName) ? rawName[0] : (rawName ?? (type === 'log' ? '学びの記録' : type === 'spot' ? 'まちの場所' : 'まちの人'))
   const catJa = CATEGORY_JA[p.category] ?? p.category
 
   return (
@@ -141,15 +148,26 @@ function ItemCard({ item, onSelect }) {
           )}
         </div>
         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-          {p.category && (
+          {type === 'log' && p['spot-visited'] && (
+            <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-emerald-100 text-emerald-700">
+              {p['spot-visited']}
+            </span>
+          )}
+          {type === 'log' && p.date && (
+            <span className="text-xs text-gray-400">{p.date.slice(0, 10)}</span>
+          )}
+          {type !== 'log' && p.category && (
             <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-              isSpot ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+              type === 'spot' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
             }`}>
               {catJa}{p.category !== catJa ? ` / ${p.category}` : ''}
             </span>
           )}
           {p['what-i-can-teach'] && (
             <span className="text-xs text-gray-400 truncate max-w-[150px]">{p['what-i-can-teach']}</span>
+          )}
+          {type === 'log' && p['what-i-learned'] && (
+            <span className="text-xs text-gray-400 truncate max-w-[180px]">{p['what-i-learned']}</span>
           )}
         </div>
       </div>

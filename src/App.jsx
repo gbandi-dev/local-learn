@@ -116,10 +116,12 @@ export default function App() {
   const allItems = [
     ...allSpots.map((f) => ({ ...f, _type: f._type ?? 'spot' })),
     ...allMentors.map((f) => ({ ...f, _type: f._type ?? 'mentor' })),
+    ...logs.map((f) => ({ ...f, _type: 'log' })),
   ].filter((item) => {
     if (tab === 'spots'   && item._type !== 'spot')   return false
     if (tab === 'mentors' && item._type !== 'mentor') return false
-    if (category !== 'all') {
+    if (tab === 'logs'    && item._type !== 'log')    return false
+    if (category !== 'all' && item._type !== 'log') {
       if ((item.properties?.category ?? '').toLowerCase() !== category.toLowerCase()) return false
     }
     return true
@@ -198,7 +200,7 @@ export default function App() {
 
   const sidebarEl = (
     <Sidebar
-      spots={allSpots} mentors={allMentors} items={allItems}
+      spots={allSpots} mentors={allMentors} logs={logs} items={allItems}
       loading={loading} error={error} selected={selected}
       onSelect={setSelected} category={category} onCategory={setCategory}
       tab={tab} onTab={setTab} isOpen={true}
@@ -210,7 +212,7 @@ export default function App() {
 
   const mobileSidebarEl = (
     <Sidebar
-      spots={allSpots} mentors={allMentors} items={allItems}
+      spots={allSpots} mentors={allMentors} logs={logs} items={allItems}
       loading={loading} error={error} selected={selected}
       onSelect={setSelected} category={category} onCategory={setCategory}
       tab={tab} onTab={setTab} isOpen={true}
