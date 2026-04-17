@@ -12,7 +12,7 @@
  * Actual CMS field keys (from schema):
  *   Learning Spots:   username, area-description, category, photo, location, recommended-for, submitted-by-user
  *   Community Mentors: name, what-i-can-teach, languages, available-when, location
- *   Learning Logs:    name, role, spot-visited, date, what-i-learned, photo, language-written-in, teacher
+ *   Learning Logs:    name, role, spot-visited, date, what-i-learned, photo, language-written-in, teacher, location-point
  */
 
 const BASE      = 'https://api.cms.reearth.io'
@@ -88,12 +88,12 @@ function buildFields(type, data) {
       { key: 'name',                value: data.name },
       { key: 'role',                value: data.role },
       { key: 'spot-visited',        value: data['spot-visited'] },
-      { key: 'date',                value: data.date },
+      { key: 'date',                value: data.date ? `${data.date}T00:00:00.000Z` : null },
       { key: 'what-i-learned',      value: data['what-i-learned'] },
-      { key: 'language-written-in', value: data['language-written-in'] },
+      { key: 'language-written-in', value: Array.isArray(data['language-written-in']) ? data['language-written-in'].join(', ') : data['language-written-in'] },
       { key: 'teacher',             value: data.teacher },
       data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
-      hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
+      hasLocation ? { key: 'location-point', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
 
@@ -155,6 +155,24 @@ export async function createCmsItem(type, data) {
   ).catch(() => null) // non-fatal if publish fails
 
   return created
+}
+
+/**
+ * Fetch a single item by ID (includes resolved asset URLs).
+ *
+ * @param {'spot' | 'mentor'} type
+ * @param {string} itemId
+ */
+export async function fetchCmsItemById(type, itemId) {
+  if (!isCmsConfigured()) return null
+  const modelId = MODEL_IDS[type]
+  if (!modelId) return null
+  const res = await fetch(
+    `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items/${itemId}`,
+    { headers: { Authorization: `Bearer ${TOKEN}` } }
+  )
+  if (!res.ok) return null
+  return res.json()
 }
 
 /**

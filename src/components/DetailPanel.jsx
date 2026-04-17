@@ -1,24 +1,38 @@
+import { useState, useEffect } from 'react'
 import Comments from './Comments'
+import { fetchCmsItemById } from '../api/cms'
 
 const TYPE = {
   spot:   { ja: 'まちの場所', en: 'Place in Town',   bg: 'bg-blue-700',   pill: 'bg-blue-100 text-blue-700' },
   mentor: { ja: 'まちの人',   en: 'Person in Town',  bg: 'bg-orange-500', pill: 'bg-orange-100 text-orange-700' },
 }
 
-function extractPhotoUrl(photo) {
-  if (!photo) return null
-  if (typeof photo === 'string') return photo
-  if (Array.isArray(photo)) {
-    const first = photo[0]
-    if (!first) return null
-    return first.url ?? first
-  }
-  return photo.url ?? null
+
+function resolveAssetUrl(value) {
+  if (!value) return null
+  const first = Array.isArray(value) ? value[0] : value
+  if (!first) return null
+  if (typeof first === 'string') return first.startsWith('http') ? first : null
+  return first.url ?? null
 }
 
 export default function DetailPanel({ item, onBack }) {
   const p    = item.properties ?? {}
   const meta = TYPE[item._type] ?? TYPE.spot
+
+  const [cmsPhotoUrl, setCmsPhotoUrl] = useState(null)
+  useEffect(() => {
+    setCmsPhotoUrl(null)
+    if (!item.id || item._local || item._demo) return
+    fetchCmsItemById(item._type ?? 'spot', item.id)
+      .then((data) => {
+        if (!data?.fields) return
+        const field = data.fields.find((f) => f.key === 'photo')
+        const url = resolveAssetUrl(field?.value)
+        if (url) setCmsPhotoUrl(url)
+      })
+      .catch(() => null)
+  }, [item.id, item._type])
 
   const name        = p.name ?? p.username ?? meta.ja
   const description = p.description ?? p['area-description'] ?? p['what-i-can-teach']
@@ -43,8 +57,8 @@ export default function DetailPanel({ item, onBack }) {
 
       <div className="flex-1 overflow-y-auto">
         {/* Photo */}
-        {extractPhotoUrl(p.photo) ? (
-          <img src={extractPhotoUrl(p.photo)} alt={name} className="w-full h-44 object-cover" />
+        {cmsPhotoUrl ? (
+          <img src={cmsPhotoUrl} alt={name} className="w-full h-44 object-cover" />
         ) : (
           <div className="w-full h-32 bg-gray-200 flex items-center justify-center">
             <span className="text-gray-400 text-xs">写真なし</span>
