@@ -3,9 +3,18 @@ import Comments from './Comments'
 import { fetchItemPhotoUrl } from '../api/cms'
 
 const TYPE = {
-  spot:   { ja: 'まちの場所', en: 'Place in Town',      bg: 'bg-blue-700',    pill: 'bg-blue-100 text-blue-700'     },
-  mentor: { ja: 'まちの人',   en: 'Person in Town',     bg: 'bg-orange-500',  pill: 'bg-orange-100 text-orange-700' },
-  log:    { ja: '学びの記録', en: 'Learning Record',    bg: 'bg-emerald-700', pill: 'bg-emerald-100 text-emerald-700' },
+  spot:   { ja: 'まちの場所', en: 'Place in Town',   bg: 'bg-blue-700',    pill: 'bg-blue-100 text-blue-700'       },
+  mentor: { ja: 'まちの人',   en: 'Person in Town',  bg: 'bg-orange-500',  pill: 'bg-orange-100 text-orange-700'   },
+  log:    { ja: '学びの記録', en: 'Learning Record', bg: 'bg-emerald-700', pill: 'bg-emerald-100 text-emerald-700' },
+}
+
+const CATEGORY_JA = {
+  Nature:   '自然',
+  Workshop: 'ワークショップ',
+  Culture:  '文化',
+  Sports:   'スポーツ',
+  Library:  '図書館',
+  Other:    'その他',
 }
 
 
@@ -64,7 +73,7 @@ export default function DetailPanel({ item, onBack }) {
         <div className="p-4 space-y-3">
           {/* Badge */}
           <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${meta.pill}`}>
-            {meta.ja}
+            {meta.ja} / {meta.en}
           </span>
 
           {/* Name */}
@@ -111,19 +120,21 @@ export default function DetailPanel({ item, onBack }) {
             <>
               {p.category && (
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <p className="text-xs text-gray-400 font-semibold mb-1">カテゴリ</p>
-                  <p className="text-sm text-gray-800 font-medium">{p.category}</p>
+                  <p className="text-xs text-gray-400 font-semibold mb-1">カテゴリ / Category</p>
+                  <p className="text-sm text-gray-800 font-medium">
+                    {CATEGORY_JA[p.category] ? `${CATEGORY_JA[p.category]} / ${p.category}` : p.category}
+                  </p>
                 </div>
               )}
               {description && (
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <p className="text-xs text-gray-400 font-semibold mb-1">説明</p>
+                  <p className="text-xs text-gray-400 font-semibold mb-1">説明 / Description</p>
                   <p className="text-sm text-gray-700 leading-relaxed">{description}</p>
                 </div>
               )}
               {p['recommended-for'] && p['recommended-for'].length > 0 && (
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <p className="text-xs text-gray-400 font-semibold mb-2">おすすめ対象</p>
+                  <p className="text-xs text-gray-400 font-semibold mb-2">おすすめ対象 / Recommended For</p>
                   <div className="flex flex-wrap gap-1.5">
                     {(Array.isArray(p['recommended-for']) ? p['recommended-for'] : [p['recommended-for']]).map((r) => (
                       <span key={r} className="text-xs bg-blue-50 text-blue-700 font-medium px-2.5 py-1 rounded-full">{r}</span>
@@ -133,7 +144,7 @@ export default function DetailPanel({ item, onBack }) {
               )}
               {langs.length > 0 && (
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <p className="text-xs text-gray-400 font-semibold mb-2">言語</p>
+                  <p className="text-xs text-gray-400 font-semibold mb-2">言語 / Languages</p>
                   <div className="flex flex-wrap gap-1.5">
                     {langs.map((lang) => (
                       <span key={lang} className="text-xs bg-gray-100 text-gray-700 font-medium px-2.5 py-1 rounded-full">{lang}</span>
@@ -143,7 +154,7 @@ export default function DetailPanel({ item, onBack }) {
               )}
               {p['available-when'] && (
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
-                  <p className="text-xs text-gray-400 font-semibold mb-1">活動できる時間</p>
+                  <p className="text-xs text-gray-400 font-semibold mb-1">活動できる時間 / Available When</p>
                   <p className="text-sm text-gray-700">{p['available-when']}</p>
                 </div>
               )}
