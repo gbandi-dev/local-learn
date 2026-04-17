@@ -126,7 +126,7 @@ export default function App() {
   })
 
   async function handleSubmit(type, formData, coords) {
-    const finalCoords = coords ?? { lat: 34.674, lng: 132.334 }
+    const finalCoords = coords ?? { lat: 34.67402, lng: 132.53736 }
     if (isCmsConfigured()) {
       await createCmsItem(type, { ...formData, ...finalCoords })
       setTimeout(refresh, 2000)
