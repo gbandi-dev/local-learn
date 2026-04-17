@@ -34,10 +34,10 @@ function SuccessScreen({ onReset }) {
 }
 
 const ROLES = [
-  { value: 'student', label: '学生 / Student' },
-  { value: 'adult',   label: '大人 / Adult' },
-  { value: 'teacher', label: '先生 / Teacher' },
-  { value: 'other',   label: 'その他 / Other' },
+  { value: 'Student',          label: '学生 / Student' },
+  { value: 'Volunteer',        label: 'ボランティア / Volunteer' },
+  { value: 'Community Member', label: '地域の人 / Community Member' },
+  { value: 'Other',            label: 'その他 / Other' },
 ]
 
 const today = () => new Date().toISOString().split('T')[0]
@@ -58,6 +58,12 @@ export default function LogView({ onSubmit }) {
   function handlePhoto(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+      setFormError('写真はJPG形式のみ対応しています / Only JPG photos are supported')
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+    setFormError(null)
     setPhotoFile(file)
     setPhotoPreview(URL.createObjectURL(file))
   }

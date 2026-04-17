@@ -100,7 +100,7 @@ function buildFields(type, data) {
       { key: 'date',                value: dateVal },
       { key: 'what-i-learned',      value: data['what-i-learned'] },
       { key: 'teacher',             value: data.teacher },
-      { key: 'language-written-in', value: [data['language-written-in'] || 'ja'] },
+      { key: 'language-written-in', value: [data['language-written-in'] || 'Japanese'] },
       data.photoAssetId ? { key: 'photo', value: [data.photoAssetId] } : null,
     ]
   }
