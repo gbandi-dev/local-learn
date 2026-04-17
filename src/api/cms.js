@@ -86,6 +86,7 @@ function buildFields(type, data) {
   if (type === 'log') {
     return [
       { key: 'name',                value: data.name },
+      { key: 'role',                value: data.role },
       { key: 'spot-visited',        value: data['spot-visited'] },
       { key: 'date',                value: data.date ?? null },
       { key: 'what-i-learned',      value: data['what-i-learned'] },

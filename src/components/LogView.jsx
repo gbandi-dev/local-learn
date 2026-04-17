@@ -1,11 +1,12 @@
 import { useState } from 'react'
 
 const ROLES = [
-  { id: 'Student',   ja: '学生・生徒',   en: 'Student'   },
-  { id: 'Adult',     ja: '大人・地域住民', en: 'Adult'     },
-  { id: 'Teacher',   ja: '先生・指導者',  en: 'Teacher'   },
-  { id: 'Volunteer', ja: 'ボランティア',  en: 'Volunteer' },
-  { id: 'Other',     ja: 'その他',        en: 'Other'     },
+  { id: 'Student',          ja: '学生・生徒',   en: 'Student'          },
+  { id: 'Technical Intern', ja: '技術研修生',   en: 'Technical Intern' },
+  { id: 'Community Member', ja: '地域住民',     en: 'Community Member' },
+  { id: 'Tourist',          ja: '観光客',       en: 'Tourist'          },
+  { id: 'Volunteer',        ja: 'ボランティア', en: 'Volunteer'        },
+  { id: 'Other',            ja: 'その他',       en: 'Other'            },
 ]
 
 const LANGS = [
