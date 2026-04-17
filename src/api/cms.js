@@ -91,13 +91,10 @@ function buildFields(type, data) {
 
   if (type === 'log') {
     return [
-      { key: 'name',                value: data.name },
-      { key: 'role',                value: data.role },
-      { key: 'spot-visited',        value: data['spot-visited'] },
-      { key: 'what-i-learned',      value: data['what-i-learned'] },
-      { key: 'teacher',             value: data.teacher },
-      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
-      hasLocation ? { key: 'location-point', value: geoPoint(data.lat, data.lng) } : null,
+      { key: 'name',           value: data.name },
+      { key: 'spot-visited',   value: data['spot-visited'] },
+      { key: 'what-i-learned', value: data['what-i-learned'] },
+      { key: 'teacher',        value: data.teacher },
     ]
   }
 
@@ -116,6 +113,7 @@ export async function createCmsItem(type, data) {
   }
 
   const modelId = MODEL_IDS[type]
+  console.log('[CMS] createItem type:', type, '| modelId:', modelId)
   if (!modelId) throw new Error(`Unknown item type: ${type}`)
 
   // Upload photo file if present

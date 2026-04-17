@@ -1,48 +1,10 @@
 import { useState } from 'react'
 
-const ROLES = [
-  { id: 'Student',          ja: '学生・生徒',   en: 'Student'          },
-  { id: 'Technical Intern', ja: '技術研修生',   en: 'Technical Intern' },
-  { id: 'Community Member', ja: '地域住民',     en: 'Community Member' },
-  { id: 'Tourist',          ja: '観光客',       en: 'Tourist'          },
-  { id: 'Volunteer',        ja: 'ボランティア', en: 'Volunteer'        },
-  { id: 'Other',            ja: 'その他',       en: 'Other'            },
-]
-
-const EMPTY = {
-  name:             '',
-  role:             '',
-  'spot-visited':   '',
-  'what-i-learned': '',
-  teacher:          '',
-}
-
 function CheckIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12"/>
     </svg>
-  )
-}
-function CameraIcon({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-      <circle cx="12" cy="13" r="4"/>
-    </svg>
-  )
-}
-
-function Section({ num, ja, en, children }) {
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="px-4 pt-4 pb-3 border-b border-gray-50">
-        <span className="text-xs font-bold text-gray-400 mr-2">{num}.</span>
-        <span className="text-base font-bold text-gray-900">{ja}</span>
-        <span className="ml-2 text-xs text-gray-400 font-medium">{en}</span>
-      </div>
-      <div className="p-4">{children}</div>
-    </div>
   )
 }
 
@@ -56,50 +18,28 @@ function SuccessScreen({ onReset }) {
       <p className="text-gray-500 mt-1 text-sm">Learning record saved</p>
       <button onClick={onReset}
         className="mt-8 w-full max-w-xs py-3 bg-teal-700 text-white rounded-xl text-sm font-bold active:scale-95 transition-all">
-        続けて記録する<br /><span className="text-xs font-normal text-teal-200">Add Another Record</span>
+        続けて記録する / Add Another Record
       </button>
     </div>
   )
 }
 
-export default function LogView({ onSubmit, coords: initialCoords }) {
-  const [form,         setForm]         = useState(EMPTY)
-  const [coords,       setCoords]       = useState(initialCoords ?? null)
-  const [geoLoading,   setGeoLoading]   = useState(false)
-  const [photoFile,    setPhotoFile]    = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(null)
-  const [submitting,   setSubmitting]   = useState(false)
-  const [done,         setDone]         = useState(false)
-  const [formError,    setFormError]    = useState(null)
+const EMPTY = { name: '', 'spot-visited': '', 'what-i-learned': '', teacher: '' }
 
-  function handleGeolocate() {
-    if (!navigator.geolocation) return
-    setGeoLoading(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-        setGeoLoading(false)
-      },
-      () => setGeoLoading(false),
-      { timeout: 10000 }
-    )
-  }
+export default function LogView({ onSubmit }) {
+  const [form,       setForm]       = useState(EMPTY)
+  const [submitting, setSubmitting] = useState(false)
+  const [done,       setDone]       = useState(false)
+  const [formError,  setFormError]  = useState(null)
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
-
-  function handlePhoto(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setPhotoFile(file)
-    setPhotoPreview(URL.createObjectURL(file))
-  }
 
   async function handleSubmit() {
     if (!form.name.trim() || !form['what-i-learned'].trim()) return
     setSubmitting(true)
     setFormError(null)
     try {
-      await onSubmit('log', { ...form, photoFile }, coords)
+      await onSubmit('log', form, null)
       setDone(true)
     } catch (err) {
       setFormError(err.message)
@@ -108,135 +48,84 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
     }
   }
 
-  function reset() {
-    setDone(false)
-    setForm(EMPTY)
-    setPhotoFile(null)
-    setPhotoPreview(null)
-    setFormError(null)
-  }
-
-  if (done) return <SuccessScreen onReset={reset} />
+  if (done) return <SuccessScreen onReset={() => { setDone(false); setForm(EMPTY); setFormError(null) }} />
 
   const canSubmit = form.name.trim() && form['what-i-learned'].trim() && !submitting
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-100 pb-24">
-      <div className="bg-teal-50 border-b border-teal-100 px-4 py-2.5">
-        <p className="text-xs text-teal-700 font-medium">
-          <span className="font-bold">学びの記録</span>
-          <span className="mx-1.5 text-teal-300">·</span>
-          <span className="text-teal-600">Learning Record — 北広島町</span>
-        </p>
+    <div className="flex-1 overflow-y-auto bg-gray-50 pb-10">
+      <div className="bg-teal-50 border-b border-teal-100 px-4 py-3">
+        <p className="text-sm font-bold text-teal-700">学びの記録 <span className="font-normal text-teal-500">· Learning Record</span></p>
+        <p className="text-xs text-teal-500 mt-0.5">北広島町 · Kitahiroshimacho</p>
       </div>
 
-      <div className="px-4 py-4 space-y-3">
+      <div className="px-4 py-5 space-y-4 max-w-lg mx-auto">
 
-        {/* Location */}
-        <Section num="📍" ja="場所" en="Location">
-          {coords ? (
-            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
-              <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-              <span className="flex-1 text-sm font-mono text-green-800">{coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}</span>
-            </div>
-          ) : (
-            <p className="text-xs text-gray-400 mb-2">位置情報なし / No location set</p>
-          )}
-          <button
-            type="button"
-            onClick={handleGeolocate}
-            disabled={geoLoading}
-            className="mt-2 w-full flex items-center justify-center gap-2 py-2 rounded-xl border-2 border-teal-200 bg-teal-50 text-teal-700 text-xs font-semibold active:scale-95 transition-all disabled:opacity-50"
-          >
-            {geoLoading
-              ? <span className="w-3.5 h-3.5 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
-              : <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-            }
-            現在地を使う / Use My Location
-          </button>
-        </Section>
-
-        {/* 1. 名前 */}
-        <Section num="1" ja="あなたの名前" en="Your Name">
-          <input type="text" value={form.name}
+        {/* Name */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+            名前 / Name <span className="text-red-400 normal-case font-normal ml-1">必須</span>
+          </label>
+          <input
+            type="text"
+            value={form.name}
             onChange={(e) => set('name', e.target.value)}
-            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-            placeholder="例：田中ひろし" />
-        </Section>
+            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors bg-white"
+            placeholder="例：田中ひろし"
+          />
+        </div>
 
-        {/* 2. 役割 */}
-        <Section num="2" ja="役割" en="Role">
-          <div className="space-y-2">
-            {ROLES.map((r) => {
-              const active = form.role === r.id
-              return (
-                <button key={r.id} onClick={() => set('role', r.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.98] ${
-                    active ? 'border-teal-300 bg-teal-50' : 'border-gray-100 bg-white hover:border-gray-200'
-                  }`}>
-                  <div className={`w-3 h-3 rounded-full shrink-0 ${active ? 'bg-teal-600' : 'bg-gray-300'}`} />
-                  <div className="text-left">
-                    <p className={`text-sm font-bold ${active ? 'text-teal-800' : 'text-gray-700'}`}>{r.ja}</p>
-                    <p className={`text-xs ${active ? 'text-teal-500' : 'text-gray-400'}`}>{r.en}</p>
-                  </div>
-                  {active && <CheckIcon className="w-4 h-4 text-teal-600 ml-auto" />}
-                </button>
-              )
-            })}
-          </div>
-        </Section>
-
-        {/* 3. 訪問した場所 */}
-        <Section num="3" ja="訪問した場所・まちの人" en="Spot or Person Visited">
-          <input type="text" value={form['spot-visited']}
+        {/* Spot visited */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+            訪問した場所 / Spot Visited
+          </label>
+          <input
+            type="text"
+            value={form['spot-visited']}
             onChange={(e) => set('spot-visited', e.target.value)}
-            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-            placeholder="例：北広島町立図書館、田中ひろしさん" />
-        </Section>
+            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors bg-white"
+            placeholder="例：北広島町立図書館"
+          />
+        </div>
 
-        {/* 4. 学んだこと */}
-        <Section num="4" ja="学んだこと・感じたこと" en="What I Learned">
-          <textarea value={form['what-i-learned']}
+        {/* What I learned */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+            学んだこと / What I Learned <span className="text-red-400 normal-case font-normal ml-1">必須</span>
+          </label>
+          <textarea
+            value={form['what-i-learned']}
             onChange={(e) => set('what-i-learned', e.target.value)}
-            rows={4}
-            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none"
-            placeholder="今日の体験で気づいたこと、感じたこと、学んだことを自由に書いてください…" />
-        </Section>
+            rows={5}
+            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none bg-white"
+            placeholder="今日の体験で気づいたこと、感じたこと、学んだことを自由に書いてください…"
+          />
+        </div>
 
-        {/* 5. 写真 */}
-        <Section num="5" ja="写真" en="Photo">
-          <input id="log-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handlePhoto} />
-          {photoPreview ? (
-            <div className="relative rounded-xl overflow-hidden">
-              <img src={photoPreview} alt="preview" className="w-full h-48 object-cover" />
-              <button onClick={() => { setPhotoPreview(null); setPhotoFile(null) }}
-                className="absolute top-2 right-2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">×</button>
-            </div>
-          ) : (
-            <label htmlFor="log-photo"
-              className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-7 cursor-pointer active:scale-95 transition-all">
-              <CameraIcon className="w-8 h-8 text-teal-500" />
-              <span className="text-sm font-bold text-teal-700">写真を追加</span>
-              <span className="text-xs text-teal-500">Add a Photo (optional)</span>
-            </label>
-          )}
-        </Section>
-
-        {/* 6. 先生・スタッフメモ */}
-        <Section num="6" ja="先生・スタッフへのメモ（任意）" en="Note to Teacher / Staff">
-          <textarea value={form.teacher}
+        {/* Teacher note */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+            先生・スタッフへのメモ / Note to Teacher
+          </label>
+          <textarea
+            value={form.teacher}
             onChange={(e) => set('teacher', e.target.value)}
             rows={3}
-            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none"
-            placeholder="先生やスタッフへの連絡事項があれば…" />
-        </Section>
+            className="w-full border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors resize-none bg-white"
+            placeholder="先生やスタッフへの連絡事項があれば…"
+          />
+        </div>
 
         {formError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 max-h-48 overflow-y-auto break-all whitespace-pre-wrap">{formError}</div>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 break-all whitespace-pre-wrap">{formError}</div>
         )}
 
-        <button onClick={handleSubmit} disabled={!canSubmit}
-          className="w-full py-4 bg-teal-700 text-white font-bold text-base rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all shadow-lg shadow-teal-200">
+        <button
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          className="w-full py-4 bg-teal-700 text-white font-bold text-base rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all shadow-lg shadow-teal-200"
+        >
           記録を送信する
           <span className="block text-xs font-normal text-teal-200 mt-0.5">Submit Learning Record</span>
         </button>
