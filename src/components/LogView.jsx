@@ -9,21 +9,12 @@ const ROLES = [
   { id: 'Other',            ja: 'その他',       en: 'Other'            },
 ]
 
-const LANGS = [
-  { id: 'Japanese',   ja: '日本語',    en: 'Japanese'   },
-  { id: 'English',    ja: '英語',      en: 'English'    },
-  { id: 'Vietnamese', ja: 'ベトナム語', en: 'Vietnamese' },
-  { id: 'Other',      ja: 'その他',    en: 'Other'      },
-]
-
 const EMPTY = {
-  name:                '',
-  role:                '',
-  'spot-visited':      '',
-  date:                new Date().toISOString().split('T')[0],
-  'what-i-learned':    '',
-  'language-written-in': '',
-  teacher:             '',
+  name:             '',
+  role:             '',
+  'spot-visited':   '',
+  'what-i-learned': '',
+  teacher:          '',
 }
 
 function CheckIcon({ className }) {
@@ -72,14 +63,14 @@ function SuccessScreen({ onReset }) {
 }
 
 export default function LogView({ onSubmit, coords: initialCoords }) {
-  const [form,       setForm]       = useState(EMPTY)
-  const [coords,     setCoords]     = useState(initialCoords ?? null)
-  const [geoLoading, setGeoLoading] = useState(false)
-  const [photoFile,  setPhotoFile]  = useState(null)
+  const [form,         setForm]         = useState(EMPTY)
+  const [coords,       setCoords]       = useState(initialCoords ?? null)
+  const [geoLoading,   setGeoLoading]   = useState(false)
+  const [photoFile,    setPhotoFile]    = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [done,       setDone]       = useState(false)
-  const [formError,  setFormError]  = useState(null)
+  const [submitting,   setSubmitting]   = useState(false)
+  const [done,         setDone]         = useState(false)
+  const [formError,    setFormError]    = useState(null)
 
   function handleGeolocate() {
     if (!navigator.geolocation) return
@@ -95,7 +86,6 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
   }
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })) }
-  function setLang(id) { set('language-written-in', id) }
 
   function handlePhoto(e) {
     const file = e.target.files?.[0]
@@ -120,7 +110,7 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
 
   function reset() {
     setDone(false)
-    setForm({ ...EMPTY, date: new Date().toISOString().split('T')[0] })
+    setForm(EMPTY)
     setPhotoFile(null)
     setPhotoPreview(null)
     setFormError(null)
@@ -204,15 +194,8 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
             placeholder="例：北広島町立図書館、田中ひろしさん" />
         </Section>
 
-        {/* 4. 日付 */}
-        <Section num="4" ja="日付" en="Date">
-          <input type="date" value={form.date}
-            onChange={(e) => set('date', e.target.value)}
-            className="w-full min-w-0 border-2 border-gray-200 focus:border-teal-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors box-border" />
-        </Section>
-
-        {/* 5. 学んだこと */}
-        <Section num="5" ja="学んだこと・感じたこと" en="What I Learned">
+        {/* 4. 学んだこと */}
+        <Section num="4" ja="学んだこと・感じたこと" en="What I Learned">
           <textarea value={form['what-i-learned']}
             onChange={(e) => set('what-i-learned', e.target.value)}
             rows={4}
@@ -220,8 +203,8 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
             placeholder="今日の体験で気づいたこと、感じたこと、学んだことを自由に書いてください…" />
         </Section>
 
-        {/* 6. 写真 */}
-        <Section num="6" ja="写真" en="Photo">
+        {/* 5. 写真 */}
+        <Section num="5" ja="写真" en="Photo">
           <input id="log-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handlePhoto} />
           {photoPreview ? (
             <div className="relative rounded-xl overflow-hidden">
@@ -239,30 +222,8 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
           )}
         </Section>
 
-        {/* 7. 言語 */}
-        <Section num="7" ja="記録の言語" en="Language Written In">
-          <div className="space-y-2">
-            {LANGS.map((l) => {
-              const active = form['language-written-in'] === l.id
-              return (
-                <button key={l.id} onClick={() => setLang(l.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all active:scale-[0.98] ${
-                    active ? 'border-teal-300 bg-teal-50' : 'border-gray-100 bg-white hover:border-gray-200'
-                  }`}>
-                  <div className={`w-3 h-3 rounded-full shrink-0 ${active ? 'bg-teal-600' : 'bg-gray-300'}`} />
-                  <div className="text-left">
-                    <p className={`text-sm font-bold ${active ? 'text-teal-800' : 'text-gray-700'}`}>{l.ja}</p>
-                    <p className={`text-xs ${active ? 'text-teal-500' : 'text-gray-400'}`}>{l.en}</p>
-                  </div>
-                  {active && <CheckIcon className="w-4 h-4 text-teal-600 ml-auto" />}
-                </button>
-              )
-            })}
-          </div>
-        </Section>
-
-        {/* 8. 先生・スタッフメモ */}
-        <Section num="8" ja="先生・スタッフへのメモ（任意）" en="Note to Teacher / Staff">
+        {/* 6. 先生・スタッフメモ */}
+        <Section num="6" ja="先生・スタッフへのメモ（任意）" en="Note to Teacher / Staff">
           <textarea value={form.teacher}
             onChange={(e) => set('teacher', e.target.value)}
             rows={3}
