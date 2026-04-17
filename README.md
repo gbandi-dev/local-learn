@@ -6,7 +6,8 @@ Community Learning Map for Kitahiroshimacho, Hiroshima
 [🌐 Open the app](https://gbandi-dev.github.io/local-learn/) ・ [📂 GitHub](https://github.com/gbandi-dev/local-learn)
 
 <p align="center">
-  <img src="<img width="1024" height="730" alt="image" src="https://github.com/user-attachments/assets/a08f8bcb-aa71-4495-a610-4497410cba50" />
+  <img src="<img width="1022" height="730" alt="Screenshot 2026-04-17 at 22 55 21" src="https://github.com/user-attachments/assets/f2a42950-677d-4423-afaf-49ad3094f5ad" />
+" height="730" alt="image" src="https://github.com/user-attachments/assets/a08f8bcb-aa71-4495-a610-4497410cba50" />
 " alt="Local Learn screenshot" width="92%" />
 </p>
 
