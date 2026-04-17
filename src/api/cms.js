@@ -90,11 +90,18 @@ function buildFields(type, data) {
   }
 
   if (type === 'log') {
+    const dateVal = data.date
+      ? new Date(data.date).toISOString()
+      : new Date().toISOString()
     return [
-      { key: 'name',           value: data.name },
-      { key: 'spot-visited',   value: data['spot-visited'] },
-      { key: 'what-i-learned', value: data['what-i-learned'] },
-      { key: 'teacher',        value: data.teacher },
+      { key: 'name',                value: [data.name] },
+      { key: 'role',                value: data.role },
+      { key: 'spot-visited',        value: data['spot-visited'] },
+      { key: 'date',                value: dateVal },
+      { key: 'what-i-learned',      value: data['what-i-learned'] },
+      { key: 'teacher',             value: data.teacher },
+      { key: 'language-written-in', value: [data['language-written-in'] || 'ja'] },
+      data.photoAssetId ? { key: 'photo', value: [data.photoAssetId] } : null,
     ]
   }
 
@@ -122,7 +129,7 @@ export async function createCmsItem(type, data) {
     const asset = await uploadAsset(data.photoFile)
     console.log('[CMS] asset upload result for', type, ':', asset)
     if (type === 'log') {
-      enrichedData = { ...data, photoAssetId: asset?.url ?? null }
+      enrichedData = { ...data, photoAssetId: asset?.id ?? null }
     } else {
       // Asset field — send single ID string
       enrichedData = { ...data, photoAssetId: asset?.id ?? null }
