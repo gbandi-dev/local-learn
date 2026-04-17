@@ -271,7 +271,7 @@ export default function LogView({ onSubmit, coords: initialCoords }) {
         </Section>
 
         {formError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{formError}</div>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 max-h-48 overflow-y-auto break-all whitespace-pre-wrap">{formError}</div>
         )}
 
         <button onClick={handleSubmit} disabled={!canSubmit}

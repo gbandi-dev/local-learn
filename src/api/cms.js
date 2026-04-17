@@ -141,7 +141,9 @@ export async function createCmsItem(type, data) {
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText)
-    throw new Error(`CMS ${res.status}: ${text} | fields: ${JSON.stringify(fields)}`)
+    const msg = `CMS ${res.status}: ${text} | fields: ${JSON.stringify(fields)}`
+    console.error('[CMS]', msg)
+    throw new Error(msg)
   }
 
   const created = await res.json()

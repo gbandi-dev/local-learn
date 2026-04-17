@@ -238,7 +238,7 @@ export default function AddItemModal({ type, coords: initialCoords, onClose, onS
             )}
           </div>
 
-          {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{error}</div>}
+          {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 max-h-48 overflow-y-auto break-all whitespace-pre-wrap">{error}</div>}
           {done  && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-700 font-medium">保存しました！/ Saved! Refreshing map…</div>}
         </div>
 
