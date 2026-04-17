@@ -88,7 +88,7 @@ function buildFields(type, data) {
       { key: 'name',           value: data.name },
       { key: 'role',           value: data.role },
       { key: 'spot-visited',   value: data['spot-visited'] },
-      { key: 'date',           value: data.date ?? null },
+      { key: 'date',           value: data.date ? `${data.date}T00:00:00.000Z` : null },
       { key: 'what-i-learned', value: data['what-i-learned'] },
       { key: 'teacher',        value: data.teacher },
       hasLocation ? { key: 'location-point', value: geoPoint(data.lat, data.lng) } : null,
