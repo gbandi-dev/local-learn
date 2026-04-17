@@ -44,7 +44,7 @@ const today = () => new Date().toISOString().split('T')[0]
 
 const EMPTY = { name: '', role: '', 'spot-visited': '', date: today(), 'what-i-learned': '', teacher: '' }
 
-export default function LogView({ onSubmit }) {
+export default function LogView({ onSubmit, coords }) {
   const [form,         setForm]         = useState(EMPTY)
   const [photoFile,    setPhotoFile]    = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
@@ -81,7 +81,7 @@ export default function LogView({ onSubmit }) {
     setSubmitting(true)
     setFormError(null)
     try {
-      await onSubmit('log', { ...form, photoFile }, null)
+      await onSubmit('log', { ...form, photoFile }, coords)
       setDone(true)
     } catch (err) {
       setFormError(err.message)
