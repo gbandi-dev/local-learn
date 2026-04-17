@@ -85,12 +85,14 @@ function buildFields(type, data) {
 
   if (type === 'log') {
     return [
-      { key: 'name',           value: data.name },
-      { key: 'role',           value: data.role },
-      { key: 'spot-visited',   value: data['spot-visited'] },
-      // date field skipped temporarily — format under investigation
-      { key: 'what-i-learned', value: data['what-i-learned'] },
-      { key: 'teacher',        value: data.teacher },
+      { key: 'name',                value: data.name },
+      { key: 'role',                value: data.role },
+      { key: 'spot-visited',        value: data['spot-visited'] },
+      { key: 'date',                value: data.date ? `${data.date}T00:00:00.000Z` : null },
+      { key: 'what-i-learned',      value: data['what-i-learned'] },
+      { key: 'language-written-in', value: data['language-written-in'] },
+      { key: 'teacher',             value: data.teacher },
+      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
       hasLocation ? { key: 'location-point', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
@@ -177,6 +179,7 @@ export async function fetchItemPhotoUrl(type, itemId) {
   const data = await res.json()
 
   const field = data.fields?.find((f) => f.key === 'photo')
+  console.log('[photo] item fields:', data.fields?.map((f) => f.key), '| photo field:', field)
   if (!field?.value) return null
   const first = Array.isArray(field.value) ? field.value[0] : field.value
   if (!first) return null
@@ -185,12 +188,17 @@ export async function fetchItemPhotoUrl(type, itemId) {
   if (first?.url) return first.url
 
   if (typeof first === 'string') {
+    console.log('[photo] fetching asset by ID:', first)
     const assetRes = await fetch(
       `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/assets/${first}`,
       { headers: { Authorization: `Bearer ${TOKEN}` } }
     )
-    if (!assetRes.ok) return null
+    if (!assetRes.ok) {
+      console.log('[photo] asset fetch failed:', assetRes.status)
+      return null
+    }
     const asset = await assetRes.json()
+    console.log('[photo] asset response:', asset)
     return asset.url ?? null
   }
   return null
