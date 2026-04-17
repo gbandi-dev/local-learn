@@ -127,8 +127,6 @@ export async function createCmsItem(type, data) {
     .filter((f) => f.value !== '' && f.value !== undefined && f.value !== null)
     .filter((f) => !(Array.isArray(f.value) && f.value.length === 0))
 
-  console.log('[CMS] creating', type, JSON.stringify({ fields }, null, 2))
-
   const res = await fetch(
     `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items`,
     {
@@ -143,7 +141,7 @@ export async function createCmsItem(type, data) {
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText)
-    throw new Error(`CMS ${res.status}: ${text}`)
+    throw new Error(`CMS ${res.status}: ${text} | fields: ${JSON.stringify(fields)}`)
   }
 
   const created = await res.json()
