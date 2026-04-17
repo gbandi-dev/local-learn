@@ -1,125 +1,158 @@
-ローカルラーン / Local Learn
+# ローカルラーン / Local Learn
 
-北広島町のみんなの学びマップ
+**北広島町のみんなの学びマップ**  
 Community Learning Map for Kitahiroshimacho, Hiroshima
 
-🔗 サイトを開く / Open the app
+[🌐 Open the app](https://gbandi-dev.github.io/local-learn/) ・ [📂 GitHub](https://github.com/gbandi-dev/local-learn)
 
-📂 GitHub Repository
+<p align="center">
+  <img src="<img width="1024" height="730" alt="image" src="https://github.com/user-attachments/assets/a08f8bcb-aa71-4495-a610-4497410cba50" />
+" alt="Local Learn screenshot" width="92%" />
+</p>
 
-🖼️ Screenshot
+---
 
-(Replace with your actual screenshot file — e.g. /public/screenshot.png or /docs/screenshot.png)
+## Why this matters
 
-🧭 概要 / Overview
+Local Learn focuses on two real gaps in Kitahiroshimacho:
 
-ローカルラーンは、北広島町の「場所」「人」「学び」をつなぐインタラクティブな地図アプリです。
-Local Learn is an interactive map that connects places, people, and learning experiences in Kitahiroshimacho.
+- **Kids not attending school** who need alternative learning paths
+- **Technical interns from Southeast Asia** trying to navigate rural Japanese life
 
-🎯 Why it matters
+Instead of building another top-down system, this creates a simple local learning network that residents can grow together.
 
-This project focuses on two real gaps in the community:
+People in town can add:
 
-子どもの学びの選択肢不足
-Kids not attending school who need alternative learning paths
-地方での生活に適応する外国人インターンの課題
-Technical interns from Southeast Asia navigating rural Japanese life
+- 📍 **Learning places**
+- 👥 **Local teachers / people who can help**
+- 🟢 **Learning logs**
 
-Instead of building another top-down system, this creates a local, bottom-up learning network:
+All of it lives on an interactive map that makes local knowledge easier to find, share, and use.
 
-Residents can map learning places (📍)
-Share people who can teach (👥)
-Record real learning experiences (🟢 学)
+---
 
-All connected through a simple, shared map.
+## What it does
 
-🧩 主な機能 / Core Features
-🗺️ 地図ベースの探索 / Map-based exploration
-📍 まちの場所 / Places
-👥 まちの人 / People
-🟢 学びの記録 / Learning records
-🔍 フィルター（種類・カテゴリ）/ Filters
-➕ 投稿機能 / Add places, people, records
-使い方 / How to Use
-🗺️ 地図を見る / Browsing the Map
-ピン	意味	Pin	Meaning
-🔵 場	学べる場所	🔵 Place	A place to learn
-🟠 人	教えてくれる人	🟠 Person	Someone who can teach
-🟢 学	学びの記録	🟢 Record	A learning experience
+- 🗺️ Explore the town through an interactive map
+- 📍 Add places where people can learn
+- 👥 Add people who can teach or support others
+- 🟢 Record learning experiences
+- 🔍 Filter by type and category
+- ❓ Open the help guide anytime
+- 🔐 Admin moderation for publishing and deletion
 
-タップすると詳細が表示されます。
-Tap any pin to see details.
+---
 
-➕ 投稿する / Contribute
+## How to use
 
-左下のボタンから追加できます：
+### Map pins
 
-📍 場所を追加 / Add a Place
-👥 人を追加 / Add a Person
-🟢 記録を追加 / Add a Record
-📝 学びを記録する / Logging
+The map shows three pin types:
 
-記録できる内容：
+| Pin | Japanese | Meaning |
+|---|---|---|
+| 🔵 | **場** | A place in town to learn |
+| 🟠 | **人** | A person in town who can teach |
+| 🟢 | **学** | A logged learning experience |
 
-名前 / Name
-役割 / Role
-訪問した場所や人 / Place or person
-日付 / Date
-学び・気づき / What you learned
-写真（任意）/ Photo
-❓ ヘルプ / Help
-初回3回はガイド表示
-以降は右上の ? から確認
-🔐 管理者向け / Admin
+Tap any pin to open its details.
 
-ロゴを 0.6秒以内に3回タップで管理画面へ。
-Triple-tap the logo to access admin mode.
+### Add a place
 
-🌱 Sustainability note
+1. Tap **「場所を追加 / Add a Place」**
+2. Tap the map to place a pin, or use **「現在地を使う / Use My Location」**
+3. Fill in the form and save
 
-This project was built heavily using Claude / Claude Code.
+### Add a person
 
-Rough estimate:
+1. Tap **「まちの人を追加 / Add a Person」**
+2. Choose a location on the map
+3. Add:
+   - name
+   - what they can teach
+   - availability
 
-5–15 kg CO₂ total
+### Add a learning log
 
-Equivalent to:
+Open **「学びの記録 / Records」** and log:
 
-~20–60 km of driving
-~300–900 phone charges
-a few days of household electricity
+- your name
+- your role
+- the place or person visited
+- the date
+- what you learned or felt
+- an optional photo
 
-This wasn’t meant to be a throwaway demo.
+### Help
 
-If even a few kids or interns use it to navigate learning and life here,
-then that cost turns into something with real value.
+- A welcome guide appears during the first 3 visits
+- After that, tap the **?** button in the top-right anytime
 
-🤝 Community
+---
 
-Planning to map the town together with local residents —
-something that already happens informally, now made visible.
+## Admin
 
-Big thanks to @Maher and @Yamazaki for the support 🙏
+Triple-tap the logo within **0.6 seconds** to open the admin password prompt.
 
-💻 開発者向け / For Developers
-npm install
-npm run dev
-npm run build
+Admins can:
 
-.env.example をコピーして .env を作成：
+- publish submissions
+- delete submissions
 
-VITE_REEARTH_API_TOKEN=
-VITE_REEARTH_WORKSPACE_ID=
-VITE_REEARTH_PROJECT_ID=
-VITE_REEARTH_SPOTS_MODEL_ID=
-VITE_REEARTH_MENTORS_MODEL_ID=
-VITE_REEARTH_LOGS_MODEL_ID=
-VITE_ADMIN_PASSWORD=
-📍 Location
+---
 
-北広島町（広島県）
+## Sustainability note
+
+This project was built heavily using Claude and Claude Code.
+
+Estimated total footprint: **5 to 15 kg CO₂**
+
+Roughly equivalent to:
+
+- **20 to 60 km** of driving
+- **300 to 900** phone charges
+- **a few days** of average household electricity use
+
+This was not meant to be a throwaway demo.
+
+If it ends up helping even a small number of kids or interns navigate learning and life here, then that compute turns into something useful rather than just burned effort.
+
+---
+
+## Community
+
+I’m planning to spend this weekend mapping the town with local people. We already spend time together most weekends, so it feels natural to start building this into that rhythm.
+
+Big thanks to **@Maher** and **@Yamazaki** for the support 🙏
+
+---
+
+## For developers
+
+    npm install
+    npm run dev
+    npm run build
+
+Copy `.env.example` to `.env` and fill in:
+
+    VITE_REEARTH_API_TOKEN=
+    VITE_REEARTH_WORKSPACE_ID=
+    VITE_REEARTH_PROJECT_ID=
+    VITE_REEARTH_SPOTS_MODEL_ID=
+    VITE_REEARTH_MENTORS_MODEL_ID=
+    VITE_REEARTH_LOGS_MODEL_ID=
+    VITE_ADMIN_PASSWORD=
+
+---
+
+## License
+
+This project is **open source, free to use, and released under the MIT License**.
+
+You are free to use, modify, and distribute this project, including for personal and commercial use, as long as the original license notice is included.
+
+---
+
+## Location
+
 Kitahiroshimacho, Hiroshima, Japan
-
-📜 License
-
-MIT
