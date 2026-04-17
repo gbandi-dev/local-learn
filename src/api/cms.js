@@ -88,7 +88,7 @@ function buildFields(type, data) {
       { key: 'name',                value: data.name },
       { key: 'role',                value: data.role },
       { key: 'spot-visited',        value: data['spot-visited'] },
-      { key: 'date',                value: data.date ? `${data.date}T00:00:00.000Z` : null },
+      { key: 'date',                value: data.date ?? null },
       { key: 'what-i-learned',      value: data['what-i-learned'] },
       { key: 'language-written-in', value: Array.isArray(data['language-written-in']) ? data['language-written-in'].join(', ') : data['language-written-in'] },
       { key: 'teacher',             value: data.teacher },
@@ -158,21 +158,44 @@ export async function createCmsItem(type, data) {
 }
 
 /**
- * Fetch a single item by ID (includes resolved asset URLs).
+ * Fetch a single item's photo URL, resolving the asset if needed.
+ * Re:Earth CMS Integration API may return asset IDs instead of URLs,
+ * so we make a second call to /assets/{id} when necessary.
  *
  * @param {'spot' | 'mentor'} type
  * @param {string} itemId
+ * @returns {Promise<string|null>}
  */
-export async function fetchCmsItemById(type, itemId) {
+export async function fetchItemPhotoUrl(type, itemId) {
   if (!isCmsConfigured()) return null
   const modelId = MODEL_IDS[type]
   if (!modelId) return null
+
   const res = await fetch(
     `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items/${itemId}`,
     { headers: { Authorization: `Bearer ${TOKEN}` } }
   )
   if (!res.ok) return null
-  return res.json()
+  const data = await res.json()
+
+  const field = data.fields?.find((f) => f.key === 'photo')
+  if (!field?.value) return null
+  const first = Array.isArray(field.value) ? field.value[0] : field.value
+  if (!first) return null
+
+  if (typeof first === 'string' && first.startsWith('http')) return first
+  if (first?.url) return first.url
+
+  if (typeof first === 'string') {
+    const assetRes = await fetch(
+      `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/assets/${first}`,
+      { headers: { Authorization: `Bearer ${TOKEN}` } }
+    )
+    if (!assetRes.ok) return null
+    const asset = await assetRes.json()
+    return asset.url ?? null
+  }
+  return null
 }
 
 /**

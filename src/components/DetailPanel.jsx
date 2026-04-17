@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Comments from './Comments'
-import { fetchCmsItemById } from '../api/cms'
+import { fetchItemPhotoUrl } from '../api/cms'
 
 const TYPE = {
   spot:   { ja: 'まちの場所', en: 'Place in Town',   bg: 'bg-blue-700',   pill: 'bg-blue-100 text-blue-700' },
@@ -8,13 +8,6 @@ const TYPE = {
 }
 
 
-function resolveAssetUrl(value) {
-  if (!value) return null
-  const first = Array.isArray(value) ? value[0] : value
-  if (!first) return null
-  if (typeof first === 'string') return first.startsWith('http') ? first : null
-  return first.url ?? null
-}
 
 export default function DetailPanel({ item, onBack }) {
   const p    = item.properties ?? {}
@@ -24,13 +17,8 @@ export default function DetailPanel({ item, onBack }) {
   useEffect(() => {
     setCmsPhotoUrl(null)
     if (!item.id || item._local || item._demo) return
-    fetchCmsItemById(item._type ?? 'spot', item.id)
-      .then((data) => {
-        if (!data?.fields) return
-        const field = data.fields.find((f) => f.key === 'photo')
-        const url = resolveAssetUrl(field?.value)
-        if (url) setCmsPhotoUrl(url)
-      })
+    fetchItemPhotoUrl(item._type ?? 'spot', item.id)
+      .then((url) => { if (url) setCmsPhotoUrl(url) })
       .catch(() => null)
   }, [item.id, item._type])
 
