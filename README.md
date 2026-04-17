@@ -1,119 +1,217 @@
-# ローカルラーン / Local Learn
+# Re:Earth CMS App Builder
 
-**北広島町のみんなの学びマップ**
-Community Learning Map for Kitahiroshimacho, Hiroshima
+A multi-agent platform that helps you design and automatically generate applications using the Re:Earth CMS Integration API.
 
-🔗 [サイトを開く / Open the app](https://gbandi-dev.github.io/local-learn)
+Describe what you want in natural language → AI designs the data model → generates a working app.
 
----
-
-## 使い方 / How to Use
-
-### 地図を見る / Browsing the Map
-
-地図には2種類のピンが表示されます。
-The map shows two types of pins:
-
-| ピン | 意味 | Pin | Meaning |
-|------|------|-----|---------|
-| 🔵 **場** | まちの場所（学べる場所） | 🔵 **場** | A place in town to learn |
-| 🟠 **人** | まちの人（教えてくれる人） | 🟠 **人** | A person in town who can teach |
-
-ピンをタップすると詳細が表示されます。
-Tap any pin to see details.
+**Demo:** Disaster Map Viewer generated from natural language
 
 ---
 
-### 場所を追加する / Adding a Place
+## Architecture
 
-1. 画面左下の **「場所を追加 / Add a Place」** ボタンをタップ
-2. 地図上でピンを置きたい場所をタップ — または **「現在地を使う / Use My Location」** で自動取得
-3. フォームに情報を入力して **「保存する」** をタップ
-
----
-
-1. Tap the **「場所を追加 / Add a Place」** button at the bottom-left of the map
-2. Tap the map where you want to place the pin — or tap **「現在地を使う / Use My Location」** to use GPS
-3. Fill in the form and tap **「保存する」** (Save)
-
----
-
-### まちの人を追加する / Adding a Person
-
-1. 画面左下の **「まちの人を追加 / Add a Person」** ボタンをタップ
-2. 地図上で場所を指定（活動拠点など）
-3. 名前・教えられること・活動時間を入力して保存
-
----
-
-1. Tap **「まちの人を追加 / Add a Person」** at the bottom-left of the map
-2. Pick a location on the map (your base of activity)
-3. Enter your name, what you can teach, and when you're available, then save
-
----
-
-### 学びを記録する / Logging a Learning Experience
-
-上部ナビの **「学びの記録 / Records」** タブをタップして、以下を記録できます：
-
-Tap the **「学びの記録 / Records」** tab in the top navigation to log:
-
-- あなたの名前 / Your name
-- 役割（学生・大人・先生など）/ Your role
-- 訪問した場所や人 / The place or person you visited
-- 日付 / Date
-- 学んだこと・感じたこと / What you learned or felt
-- 写真 / A photo (optional)
+```
+User (natural language)
+  ↓
+┌─────────────────────────────────────────┐
+│  Brainstorm Agent                       │
+│  - Reads CMS knowledge base             │
+│  - Proposes app ideas                   │
+│  - Designs data models                  │
+│  - Generates app-spec.json              │
+└───────────────┬─────────────────────────┘
+                ↓
+┌─────────────────────────────────────────┐
+│  Generator                              │
+│  - Selects template (catalog/submit/map)│
+│  - Scaffolds from template              │
+│  - Replaces placeholders                │
+│  - Generates CMS plan                   │
+└───────────────┬─────────────────────────┘
+                ↓
+┌─────────────────────────────────────────┐
+│  Generated App (Next.js + TypeScript)   │
+│  - Connects to Re:Earth CMS API         │
+│  - Mock mode for demo                   │
+│  - Ready to deploy                      │
+└─────────────────────────────────────────┘
+```
 
 ---
 
-### ヘルプ / Help
+## Quick Start
 
-- 初回3回の訪問時にウェルカム画面が表示されます。
-- それ以降は画面右上の **「?」** ボタンでいつでも確認できます。
+### Prerequisites
 
----
+- Bun >= 1.0 (runtime & package manager)
+- Node.js >= 20
+- Archon (optional — for advanced multi-agent workflows)
+- Anthropic API key (for AI brainstorm/generate features)
+- Re:Earth CMS account (optional — mock mode works without it)
 
-- The welcome screen appears automatically on your first 3 visits.
-- After that, tap the **「?」** circle in the top-right corner to reopen it anytime.
-
----
-
-## 管理者向け / For Administrators
-
-ロゴを **0.6秒以内に3回** タップするとパスワード入力画面が表示されます。ログイン後、投稿の公開・削除が可能です。
-
-Triple-tap the logo within 0.6 seconds to open the admin password prompt. Once logged in, you can publish or delete any submission.
-
----
-
-## 開発者向け / For Developers
+### Install
 
 ```bash
-# 依存関係のインストール / Install dependencies
+# Install Bun (if not installed)
+curl -fsSL https://bun.sh/install | bash
+
+# Install Archon CLI (optional, for workflow orchestration)
+curl -fsSL https://archon.diy/install | bash
+
+# Clone and install dependencies
+git clone https://github.com/eukarya-inc/reearth-cms-app-builder.git
+cd reearth-cms-app-builder
+bun install
+
+# Build the knowledge base index
+bun run build-index
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+### Generate an App
+
+One-shot generation (automatic):
+
+```bash
+bun run generate "Build a catalog app for museum artifacts with images and descriptions"
+```
+
+Interactive brainstorm (conversational):
+
+```bash
+bun run brainstorm
+# or with a starting prompt:
+bun run brainstorm "I want a map viewer for disaster data"
+```
+
+Manual scaffold (from existing spec):
+
+```bash
+# Create/edit artifacts/app-spec.json manually
+bun run scaffold
+```
+
+### Run the Generated App
+
+```bash
+cd generated/<app-slug>
 npm install
-
-# 開発サーバーの起動 / Start dev server
+cp .env.example .env  # Fill in CMS credentials, or leave MOCK_MODE=true
 npm run dev
-
-# ビルド / Build
-npm run build
-```
-
-`.env.example` をコピーして `.env` を作成し、Re:Earth CMS の認証情報を設定してください。
-
-Copy `.env.example` to `.env` and fill in your Re:Earth CMS credentials.
-
-```
-VITE_REEARTH_API_TOKEN=
-VITE_REEARTH_WORKSPACE_ID=
-VITE_REEARTH_PROJECT_ID=
-VITE_REEARTH_SPOTS_MODEL_ID=
-VITE_REEARTH_MENTORS_MODEL_ID=
-VITE_REEARTH_LOGS_MODEL_ID=
-VITE_ADMIN_PASSWORD=
 ```
 
 ---
 
-北広島町 · Kitahiroshimacho, Hiroshima, Japan
+## Available Templates
+
+| Template | Use Case | Features |
+|---|---|---|
+| `catalog-next` | Read-only data browser | List, detail, search, filter |
+| `submission-next` | Data entry forms | Create, edit, delete, asset upload |
+| `geo-viewer-next` | Map visualization | Leaflet map, GeoJSON, popups, sidebar |
+
+---
+
+## Archon Workflows
+
+This project includes Archon workflow definitions for advanced orchestration:
+
+| Workflow | Purpose |
+|---|---|
+| `reearth-brainstorm` | Interactive idea generation with approval gates |
+| `reearth-connect-project` | Connect to existing CMS project and discover its structure |
+| `reearth-idea-to-app` | Full pipeline: idea → spec → scaffold → implement → review |
+| `reearth-sync-cms-plan` | Apply CMS plan to create models/fields in your project |
+| `reearth-fix-app` | Diagnose and fix build failures in generated apps |
+
+```bash
+# With Archon installed:
+archon workflow run reearth-brainstorm "I need an event registration system"
+archon workflow run reearth-idea-to-app "Build a disaster map viewer"
+```
+
+---
+
+## Project Structure
+
+```
+.archon/workflows/       # Archon workflow definitions (YAML)
+packages/
+  kb/                    # Knowledge base
+    manual/              # CMS documentation chunks (markdown)
+    openapi/             # OpenAPI spec + indexed endpoints/schemas
+  reearth-client/        # Typed TypeScript wrapper for CMS API
+  contracts/             # JSON schemas for app-spec and cms-plan
+  generator/             # Scaffolding utilities
+templates/
+  catalog-next/          # Read-only catalog template
+  submission-next/       # Form submission template
+  geo-viewer-next/       # Map viewer template
+scripts/
+  brainstorm.ts          # Interactive AI brainstorming CLI
+  generate-app.ts        # One-shot generation
+  scaffold-app.ts        # Template scaffolding
+  apply-cms-plan.ts      # Apply CMS resource plan
+  build-openapi-index.ts # Index the OpenAPI spec
+  search-kb.ts           # Search the knowledge base
+  validate-app.ts        # Validate generated apps
+generated/               # Output directory for generated apps
+artifacts/               # Intermediate files (specs, plans)
+```
+
+---
+
+## How It Works
+
+1. **Knowledge Base:** CMS documentation and API specs are chunked and indexed with MiniSearch for fast retrieval
+2. **Brainstorm Agent:** Uses Claude to ideate app concepts based on user needs + CMS capabilities
+3. **Spec Generation:** Produces a structured `app-spec.json` defining the app's data model, features, and UI
+4. **CMS Plan:** Generates a declarative `cms-plan.json` for creating models/fields in Re:Earth CMS
+5. **Scaffolding:** Copies the appropriate Next.js template and replaces placeholders with spec values
+6. **Generated App:** A complete Next.js app with CMS API integration and mock mode
+
+---
+
+## CMS Integration
+
+The generated apps connect to Re:Earth CMS via the Integration API:
+
+```
+Authorization: Bearer <your-integration-token>
+GET /api/integration/{workspaceId}/projects/{projectId}/models/{modelKey}/items
+```
+
+### Mock Mode
+
+All generated apps support `MOCK_MODE=true` — they return sample data without needing a CMS connection. This makes it easy to demo, develop, and test.
+
+---
+
+## Environment Variables
+
+| Variable | Description | Required |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | Anthropic API key for AI features | For brainstorm/generate |
+| `REEARTH_CMS_BASE_URL` | CMS API base URL | For CMS connection |
+| `REEARTH_CMS_TOKEN` | Integration API token | For CMS connection |
+| `REEARTH_CMS_WORKSPACE_ID` | Workspace ID | For CMS connection |
+| `REEARTH_CMS_PROJECT_ID` | Project ID | For CMS connection |
+| `MOCK_MODE` | Enable mock data mode | Optional |
+
+---
+
+## Security
+
+- API tokens are never hardcoded — always use environment variables
+- `.env` is gitignored
+- Generated apps keep tokens server-side only (Next.js API routes)
+- Use a personal workspace for development
+
+---
+
+## License
+
+MIT
