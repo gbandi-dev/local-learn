@@ -70,7 +70,7 @@ function buildFields(type, data) {
       { key: 'area-description',  value: data['area-description'] },
       { key: 'category',          value: data.category },
       { key: 'recommended-for',   value: data['recommended-for'] },
-      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
+      data.photoAssetId ? { key: 'photo', value: [data.photoAssetId] } : null,
       hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
@@ -81,7 +81,7 @@ function buildFields(type, data) {
       { key: 'what-i-can-teach', value: data['what-i-can-teach'] },
       { key: 'languages',        value: data.languages },
       { key: 'available-when',   value: data['available-when'] },
-      data.photoAssetId ? { key: 'photo', value: data.photoAssetId } : null,
+      data.photoAssetId ? { key: 'photo', value: [data.photoAssetId] } : null,
       hasLocation ? { key: 'location', value: geoPoint(data.lat, data.lng) } : null,
     ]
   }
