@@ -129,7 +129,7 @@ export default function App() {
     const finalCoords = coords ?? { lat: 34.674, lng: 132.334 }
     if (isCmsConfigured()) {
       await createCmsItem(type, { ...formData, ...finalCoords })
-      refresh()
+      setTimeout(refresh, 2000)
       return
     }
     // CMS not configured — save to local state only (dev/demo mode)

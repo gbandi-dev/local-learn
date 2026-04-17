@@ -58,10 +58,10 @@ export default function LogView({ onSubmit }) {
   function handlePhoto(e) {
     const file = e.target.files?.[0]
     if (!file) return
-    const name = file.name.toLowerCase()
-    const isJpeg = file.type === 'image/jpeg' || name.endsWith('.jpg') || name.endsWith('.jpeg')
-    if (!isJpeg) {
-      setFormError('写真はJPG形式のみ対応しています / Only JPG photos are supported')
+    // HEIC check by extension only — don't block by MIME type since iOS
+    // often reports image/jpeg for camera photos regardless of container
+    if (file.name.toLowerCase().match(/\.heic$|\.heif$/)) {
+      setFormError('HEIC形式は対応していません。JPGで撮影してください / HEIC not supported, please use JPG')
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -195,9 +195,9 @@ export default function LogView({ onSubmit }) {
           </p>
           <input
             ref={fileInputRef}
-            id="log-photo"
             type="file"
-            accept=".jpg,.jpeg,image/jpeg"
+            accept="image/*"
+            capture="environment"
             className="hidden"
             onChange={handlePhoto}
           />
@@ -211,12 +211,15 @@ export default function LogView({ onSubmit }) {
               >×</button>
             </div>
           ) : (
-            <label htmlFor="log-photo"
-              className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-6 cursor-pointer active:scale-95 transition-all">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex flex-col items-center justify-center gap-2 border-2 border-dashed border-teal-300 bg-teal-50 rounded-xl py-6 cursor-pointer active:scale-95 transition-all"
+            >
               <CameraIcon className="w-7 h-7 text-teal-500" />
               <span className="text-sm font-bold text-teal-700">写真を追加</span>
-              <span className="text-xs text-teal-500">Add a Photo (JPG)</span>
-            </label>
+              <span className="text-xs text-teal-500">Add a Photo</span>
+            </button>
           )}
         </div>
 
