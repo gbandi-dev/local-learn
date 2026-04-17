@@ -51,16 +51,13 @@ async function uploadAsset(file) {
     )
     clearTimeout(timer)
     if (!res.ok) {
-      const errText = await res.text().catch(() => '')
-      console.error('[CMS asset] upload failed:', res.status, errText)
-      return null
+      const errText = await res.text().catch(() => res.statusText)
+      throw new Error(`Photo upload failed (${res.status}): ${errText}`)
     }
     const data = await res.json()
-    console.log('[CMS asset] upload response:', data)
     return { id: data.id ?? null, url: data.url ?? null }
   } catch (e) {
-    console.error('[CMS asset] upload exception:', e)
-    return null
+    throw new Error(`Photo upload failed: ${e.message}`)
   }
 }
 
@@ -127,13 +124,7 @@ export async function createCmsItem(type, data) {
   let enrichedData = data
   if (data.photoFile instanceof File) {
     const asset = await uploadAsset(data.photoFile)
-    console.log('[CMS] asset upload result for', type, ':', asset)
-    if (type === 'log') {
-      enrichedData = { ...data, photoAssetId: asset?.id ?? null }
-    } else {
-      // Asset field — send single ID string
-      enrichedData = { ...data, photoAssetId: asset?.id ?? null }
-    }
+    enrichedData = { ...data, photoAssetId: asset?.id ?? null }
   }
 
   const fields = buildFields(type, enrichedData)

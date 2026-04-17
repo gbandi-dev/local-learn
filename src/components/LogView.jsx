@@ -241,7 +241,7 @@ export default function LogView({ onSubmit }) {
           disabled={!canSubmit}
           className="w-full py-4 bg-teal-700 text-white font-bold text-base rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all shadow-lg shadow-teal-200"
         >
-          {submitting ? '送信中… / Sending…' : '記録を送信する'}
+          {submitting && photoFile ? '写真をアップロード中… / Uploading photo…' : submitting ? '送信中… / Sending…' : '記録を送信する'}
           {!submitting && <span className="block text-xs font-normal text-teal-200 mt-0.5">Submit Learning Record</span>}
         </button>
 
