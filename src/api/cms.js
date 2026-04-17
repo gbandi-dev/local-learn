@@ -52,7 +52,7 @@ async function uploadAsset(file) {
     clearTimeout(timer)
     if (!res.ok) return null
     const data = await res.json()
-    return data.id ?? null
+    return { id: data.id ?? null, url: data.url ?? null }
   } catch {
     return null
   }
@@ -88,7 +88,7 @@ function buildFields(type, data) {
       { key: 'name',                value: data.name },
       { key: 'role',                value: data.role },
       { key: 'spot-visited',        value: data['spot-visited'] },
-      { key: 'date',                value: data.date ? `${data.date}T00:00:00.000Z` : null },
+      { key: 'date',                value: data.date || null },
       { key: 'what-i-learned',      value: data['what-i-learned'] },
       { key: 'language-written-in', value: data['language-written-in'] },
       { key: 'teacher',             value: data.teacher },
@@ -114,12 +114,17 @@ export async function createCmsItem(type, data) {
   const modelId = MODEL_IDS[type]
   if (!modelId) throw new Error(`Unknown item type: ${type}`)
 
-  // Upload photo file if present, attach asset ID to data
+  // Upload photo file if present
   let enrichedData = data
   if (data.photoFile instanceof File) {
-    const photoAssetId = await uploadAsset(data.photoFile)
-    // Re:Earth CMS asset fields expect an array of IDs
-    enrichedData = { ...data, photoAssetId: photoAssetId ? [photoAssetId] : null }
+    const asset = await uploadAsset(data.photoFile)
+    if (type === 'log') {
+      // Log photo field is Text type — store URL string
+      enrichedData = { ...data, photoAssetId: asset?.url ?? null }
+    } else {
+      // Spot/mentor photo fields are Asset type — store array of IDs
+      enrichedData = { ...data, photoAssetId: asset?.id ? [asset.id] : null }
+    }
   }
 
   const fields = buildFields(type, enrichedData)
@@ -167,14 +172,16 @@ export async function createCmsItem(type, data) {
  * @returns {Promise<string|null>}
  */
 export async function fetchItemPhotoUrl(type, itemId) {
-  if (!isCmsConfigured()) return null
+  console.log('[photo] fetchItemPhotoUrl called:', type, itemId)
+  if (!isCmsConfigured()) { console.log('[photo] CMS not configured'); return null }
   const modelId = MODEL_IDS[type]
-  if (!modelId) return null
+  if (!modelId) { console.log('[photo] no modelId for type:', type); return null }
 
   const res = await fetch(
     `${BASE}/api/${WORKSPACE}/projects/${PROJECT}/models/${modelId}/items/${itemId}`,
     { headers: { Authorization: `Bearer ${TOKEN}` } }
   )
+  console.log('[photo] item fetch status:', res.status)
   if (!res.ok) return null
   const data = await res.json()
 
