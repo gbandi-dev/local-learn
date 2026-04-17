@@ -150,15 +150,11 @@ export default function App() {
     setAddingType(null); setPickingLocation(false); setDraftCoords(null); setLogCoords(null)
   }
   function goTab(id) {
-    if (id === 'report') {
-      startAdding('log')
-      return
-    } else {
-      setMobileView(id)
-      if (id === 'places') setTab('spots')
-      if (id === 'list')   setTab('mentors')
-      if (id === 'map')    setTab('all')
-    }
+    setMobileView(id === 'report' ? 'list' : id)
+    if (id === 'places') setTab('spots')
+    else if (id === 'list')   setTab('mentors')
+    else if (id === 'report') setTab('logs')
+    else if (id === 'map')    setTab('all')
   }
 
   function handleLogoClick() {
@@ -253,7 +249,7 @@ export default function App() {
           {NAV.map(({ id, ja, en, Icon }) => (
             <button key={id} onClick={() => goTab(id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                (mobileView === id || (id === 'report' && mobileView === 'report-log'))
+                (mobileView === id || (id === 'report' && (mobileView === 'report-log' || tab === 'logs')))
                   ? 'bg-white/15 text-white font-bold'
                   : 'text-teal-200 hover:bg-white/10 hover:text-white'
               }`}>
@@ -327,12 +323,12 @@ export default function App() {
           {NAV.map(({ id, ja, en, Icon }) => (
             <button key={id} onClick={() => goTab(id)}
               className={`flex-1 py-2.5 flex flex-col items-center gap-0.5 transition-colors relative ${
-                (mobileView === id || (id === 'report' && mobileView === 'report-log')) ? 'text-teal-700' : 'text-gray-400'
+                (mobileView === id || (id === 'report' && (mobileView === 'report-log' || tab === 'logs'))) ? 'text-teal-700' : 'text-gray-400'
               }`}>
               <Icon className="w-4 h-4" />
               <span className="text-xs font-bold leading-none">{ja}</span>
               <span className="text-xs opacity-50 leading-none">{en}</span>
-              {(mobileView === id || (id === 'report' && mobileView === 'report-log')) && (
+              {(mobileView === id || (id === 'report' && (mobileView === 'report-log' || tab === 'logs'))) && (
                 <div className="absolute bottom-0 inset-x-0 h-0.5 bg-teal-700" />
               )}
             </button>
