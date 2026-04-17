@@ -12,7 +12,7 @@
  * Actual CMS field keys (from schema):
  *   Learning Spots:   username, area-description, category, photo, location, recommended-for, submitted-by-user
  *   Community Mentors: name, what-i-can-teach, languages, available-when, location
- *   Learning Logs:    name, role, spot-visited, date, what-i-learned, photo, language-written-in, teacher, location-point
+ *   Learning Logs:    name, role, spot-visited, date, what-i-learned, category, photo, language-written-in, teacher, location-point
  */
 
 const BASE      = 'https://api.cms.reearth.io'
@@ -96,6 +96,7 @@ function buildFields(type, data) {
       { key: 'spot-visited',        value: data['spot-visited'] },
       { key: 'date',                value: dateVal },
       { key: 'what-i-learned',      value: data['what-i-learned'] },
+      { key: 'category',            value: data.category },
       { key: 'teacher',             value: data.teacher },
       { key: 'language-written-in', value: [data['language-written-in'] || 'Japanese'] },
       data.photoAssetId ? { key: 'photo', value: [data.photoAssetId] } : null,
