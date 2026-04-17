@@ -151,7 +151,8 @@ export default function App() {
   }
   function goTab(id) {
     if (id === 'report') {
-      setMobileView('report-log')
+      startAdding('log')
+      return
     } else {
       setMobileView(id)
       if (id === 'places') setTab('spots')
